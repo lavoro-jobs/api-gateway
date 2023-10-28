@@ -9,4 +9,3 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def login():
     response = requests.get("http://auth-api/login/")
     return response
-
