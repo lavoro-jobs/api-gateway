@@ -1,13 +1,8 @@
-import logging
 import os
 import sys
 import time
 import psycopg2
 
-from fastapi.logger import logger as fastapi_logger
-
-
-logger = logging.getLogger("gunicorn.error")
 
 class Database:
     def __init__(self):
