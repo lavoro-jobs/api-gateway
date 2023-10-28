@@ -5,11 +5,10 @@ import psycopg2
 
 
 class Database:
-    def __init__(self):
-        self.connection = self.connect()
+    def __init__(self, connection_string):
+        self.connection = self.connect(connection_string)
 
-    def connect(self, max_retries=3):
-        connection_string = os.environ.get("CONFIG_DATABASE_CONNECTION_STRING")
+    def connect(self, connection_string, max_retries=3):
         for i in range(0, max_retries):
             try:
                 connection = psycopg2.connect(connection_string)
@@ -21,4 +20,4 @@ class Database:
         sys.exit(1)
 
 
-db = Database()
+db = Database(os.environ.get("DB_CONNECTION_STRING"))
