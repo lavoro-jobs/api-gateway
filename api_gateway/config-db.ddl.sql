@@ -182,4 +182,3 @@ INSERT INTO skills_catalog (skill_name) VALUES ('Oracle');
 INSERT INTO skills_catalog (skill_name) VALUES ('SQL Server');
 INSERT INTO skills_catalog (skill_name) VALUES ('DynamoDB');
 INSERT INTO skills_catalog (skill_name) VALUES ('CockroachDB');
-
