@@ -3,26 +3,29 @@ CREATE TABLE IF NOT EXISTS position_catalog (
     position_name VARCHAR(255) NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS education_catalog (
     id SERIAL PRIMARY KEY,
     education_level VARCHAR(255) NOT NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS contract_type_catalog (
     id SERIAL PRIMARY KEY,
     contract_type VARCHAR(255) NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS work_type_catalog (
     id SERIAL PRIMARY KEY,
     work_type VARCHAR(255) NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS skills_catalog (
     id SERIAL PRIMARY KEY,
     skill_name VARCHAR(255) NOT NULL
 );
-
 
 
 INSERT INTO position_catalog (position_name) VALUES ('Software Engineer');
@@ -52,6 +55,7 @@ INSERT INTO position_catalog (position_name) VALUES ('Data Analyst');
 INSERT INTO position_catalog (position_name) VALUES ('Data Engineer');
 INSERT INTO position_catalog (position_name) VALUES ('Data Architect');
 
+
 INSERT INTO education_catalog (education_level) VALUES ('High School - Incomplete');
 INSERT INTO education_catalog (education_level) VALUES ('High School - Complete');
 INSERT INTO education_catalog (education_level) VALUES ('Bachelor - Incomplete');
@@ -60,6 +64,7 @@ INSERT INTO education_catalog (education_level) VALUES ('Master - Incomplete');
 INSERT INTO education_catalog (education_level) VALUES ('Master - Complete');
 INSERT INTO education_catalog (education_level) VALUES ('PhD - Incomplete');
 INSERT INTO education_catalog (education_level) VALUES ('PhD - Complete');
+
 
 INSERT INTO contract_type_catalog (contract_type) VALUES ('Part Time');
 INSERT INTO contract_type_catalog (contract_type) VALUES ('Freelance');
@@ -70,6 +75,7 @@ INSERT INTO contract_type_catalog (contract_type) VALUES ('Full Time');
 INSERT INTO work_type_catalog (work_type) VALUES ('Remote');
 INSERT INTO work_type_catalog (work_type) VALUES ('Hybrid');
 INSERT INTO work_type_catalog (work_type) VALUES ('On Site');
+
 
 INSERT INTO skills_catalog (skill_name) VALUES ('Python');
 INSERT INTO skills_catalog (skill_name) VALUES ('Java');
