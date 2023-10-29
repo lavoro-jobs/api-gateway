@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from api_gateway.database.queries import (
+
+from lavoro_api_gateway.database.queries import (
     get_position_catalog,
     get_skills_catalog,
     get_education_catalog,

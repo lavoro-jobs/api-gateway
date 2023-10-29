@@ -1,4 +1,4 @@
-from api_gateway.database import db
+from lavoro_api_gateway.database import db
 
 
 def get_position_catalog():
