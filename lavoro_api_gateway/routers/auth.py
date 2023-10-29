@@ -21,4 +21,3 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
 @router.get("/account/current", response_model=User)
 def get_current_account(current_user: Annotated[User, Depends(get_current_active_user)]):
     return current_user
-

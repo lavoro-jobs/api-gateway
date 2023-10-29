@@ -1,4 +1,3 @@
-
 import os
 
 from typing import Annotated
@@ -16,6 +15,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 ALGORITHM = "HS256"
+
 
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
@@ -41,4 +41,3 @@ def get_current_active_user(current_user: Annotated[User, Depends(get_current_us
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
-

@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
-def propagate_response(response_model, response):
+
+def propagate_response(response, response_model=None):
     if response.status_code >= 400:
         raise HTTPException(
             status_code=response.status_code,

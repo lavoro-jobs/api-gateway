@@ -4,7 +4,8 @@ from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from lavoro_library.models import UserInDB, Token
-from lavoro_api_gateway.helpers.exceptions import propagate_response
+from lavoro_api_gateway.helpers.request_helpers import propagate_response
+
 
 def get_account(email: str):
     response = requests.get(f"http://auth-api/account/{email}")
