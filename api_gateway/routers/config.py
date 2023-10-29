@@ -7,6 +7,7 @@ from api_gateway.database.queries import (
     get_work_type_catalog,
 )
 
+
 router = APIRouter(prefix="/config", tags=["config"])
 
 
@@ -25,7 +26,6 @@ def get_skills():
 @router.get("/get_education")
 def get_education():
     result = get_education_catalog()
-
     return result
 
 
