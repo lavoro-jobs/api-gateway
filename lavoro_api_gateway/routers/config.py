@@ -8,35 +8,43 @@ from lavoro_api_gateway.database.queries import (
     get_work_type_catalog,
 )
 
+from lavoro_library.models import (
+    PositionCatalog,
+    EducationCatalog,
+    ContractTypeCatalog,
+    WorkTypeCatalog,
+    SkillsCatalog,
+)
+
 
 router = APIRouter(prefix="/config", tags=["config"])
 
 
-@router.get("/get_positions")
+@router.get("/get_positions", response_model=PositionCatalog)
 def get_positions():
     result = get_position_catalog()
     return result
 
 
-@router.get("/get_skills")
+@router.get("/get_skills", response_model=SkillsCatalog)
 def get_skills():
     result = get_skills_catalog()
     return result
 
 
-@router.get("/get_education")
+@router.get("/get_education", response_model=EducationCatalog)
 def get_education():
     result = get_education_catalog()
     return result
 
 
-@router.get("/get_contract_types")
+@router.get("/get_contract_types", response_model=ContractTypeCatalog)
 def get_contract_types():
     result = get_contract_type_catalog()
     return result
 
 
-@router.get("/get_work_types")
+@router.get("/get_work_types", response_model=WorkTypeCatalog)
 def get_work_types():
     result = get_work_type_catalog()
     return result
