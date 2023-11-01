@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+from typing import List
+
 from lavoro_api_gateway.database.queries import (
     get_position_catalog,
     get_skills_catalog,
@@ -20,31 +22,31 @@ from lavoro_library.models import (
 router = APIRouter(prefix="/config", tags=["config"])
 
 
-@router.get("/get_positions", response_model=PositionCatalog)
+@router.get("/get_positions", response_model=List[PositionCatalog])
 def get_positions():
     result = get_position_catalog()
     return result
 
 
-@router.get("/get_skills", response_model=SkillsCatalog)
+@router.get("/get_skills", response_model=List[SkillsCatalog])
 def get_skills():
     result = get_skills_catalog()
     return result
 
 
-@router.get("/get_education", response_model=EducationCatalog)
+@router.get("/get_education", response_model=List[EducationCatalog])
 def get_education():
     result = get_education_catalog()
     return result
 
 
-@router.get("/get_contract_types", response_model=ContractTypeCatalog)
+@router.get("/get_contract_types", response_model=List[ContractTypeCatalog])
 def get_contract_types():
     result = get_contract_type_catalog()
     return result
 
 
-@router.get("/get_work_types", response_model=WorkTypeCatalog)
+@router.get("/get_work_types", response_model=List[WorkTypeCatalog])
 def get_work_types():
     result = get_work_type_catalog()
     return result
