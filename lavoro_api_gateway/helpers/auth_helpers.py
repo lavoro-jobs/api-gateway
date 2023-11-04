@@ -1,10 +1,10 @@
 import requests
 
-from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 
-from lavoro_library.models import UserInDB, Token
 from lavoro_api_gateway.helpers.request_helpers import propagate_response
+from lavoro_library.models import UserInDB, Token, RegistrationForm
 
 
 def get_account(email: str):
@@ -13,8 +13,13 @@ def get_account(email: str):
 
 
 def get_token(form_data: OAuth2PasswordRequestForm):
-    response = requests.post("http://auth-api/login/token", data=vars(form_data))
+    response = requests.post("http://auth-api/login/token", data=jsonable_encoder(form_data))
     return propagate_response(response, response_model=Token)
+
+
+def register_user(form_data: RegistrationForm):
+    response = requests.post("http://auth-api/register", data=jsonable_encoder(form_data))
+    return propagate_response(response)
 
 
 def confirm_email_with_token(verification_token: str):
