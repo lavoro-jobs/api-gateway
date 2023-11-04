@@ -15,3 +15,8 @@ def get_account(email: str):
 def get_token(form_data: OAuth2PasswordRequestForm):
     response = requests.post("http://auth-api/login/token", data=vars(form_data))
     return propagate_response(response, response_model=Token)
+
+
+def confirm_email_with_token(verification_token: str):
+    response = requests.post(f"http://auth-api/register/confirm/{verification_token}")
+    return propagate_response(response)
