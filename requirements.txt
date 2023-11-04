@@ -5,5 +5,4 @@ pydantic
 uvicorn
 requests
 python-jose
-python-multipart
 lavoro-library
