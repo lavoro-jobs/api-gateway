@@ -7,8 +7,8 @@ from typing import Optional, Dict
 from jose import JWTError, jwt
 
 from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import OAuth2
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
+from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 
 
