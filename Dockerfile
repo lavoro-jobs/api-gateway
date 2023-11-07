@@ -5,6 +5,11 @@ WORKDIR /devel
 COPY ./lavoro-api-gateway/requirements.txt /devel/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /devel/requirements.txt
 
+RUN apt-get update && apt-get install -y curl
+
+RUN curl -sS https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /wait-for-it.sh \
+    && chmod +x /wait-for-it.sh
+
 COPY ./lavoro-api-gateway/lavoro_api_gateway /devel/lavoro_api_gateway
 
 
@@ -17,4 +22,5 @@ RUN /devel/pre_install.sh
 
 ENV PYTHONPATH "${PYTHONPATH}:/devel"
 
+ENTRYPOINT ["/wait-for-it.sh", "config-db:5432", "--"]
 CMD ["uvicorn", "lavoro_api_gateway.api_gateway:app", "--host", "0.0.0.0", "--port", "80"]
