@@ -5,7 +5,8 @@ WORKDIR /devel
 COPY ./lavoro-api-gateway/requirements.txt /devel/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /devel/requirements.txt
 
-RUN apt-get update && apt-get install -y curl
+RUN apk add curl
+RUN apk add bash
 
 RUN curl -sS https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -o /wait-for-it.sh \
     && chmod +x /wait-for-it.sh
