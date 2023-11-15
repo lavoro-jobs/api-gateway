@@ -13,7 +13,7 @@ from fastapi.security.utils import get_authorization_scheme_param
 
 
 from lavoro_api_gateway.helpers.auth_helpers import get_account
-from lavoro_library.models import User, TokenData
+from lavoro_library.models import Role, UserInDB, TokenData
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -72,7 +72,13 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return user
 
 
-def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
+def get_current_active_user(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+def get_current_applicant_user(current_user: Annotated[UserInDB, Depends(get_current_active_user)]):
+    if not current_user.role == Role.applicant:
+        raise HTTPException(status_code=400, detail="User is not an applicant")
     return current_user
