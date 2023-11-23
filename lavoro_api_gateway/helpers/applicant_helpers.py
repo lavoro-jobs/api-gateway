@@ -63,8 +63,8 @@ def get_applicant_profile(account_id: uuid.UUID):
         if contract_type.id == applicant_profile.contract_type_id:
             additional_info["contract_type"] = contract_type.contract_type
 
-    full_dict = applicant_profile.model_dump()
-    full_dict.update(additional_info)
-    hydrated_applicant_profile = ApplicantProfile(**full_dict)
+    applicant_profile_dict = applicant_profile.model_dump()
+    applicant_profile_dict.update(additional_info)
+    hydrated_applicant_profile = ApplicantProfile(**applicant_profile_dict)
 
     return hydrated_applicant_profile
