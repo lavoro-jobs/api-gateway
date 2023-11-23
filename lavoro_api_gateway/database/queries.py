@@ -1,34 +1,34 @@
 from typing import List
 
 from lavoro_api_gateway.database import db
-from lavoro_library.models import PositionCatalog, EducationCatalog, ContractTypeCatalog, WorkTypeCatalog, SkillsCatalog
+from lavoro_library.models import PositionInDB, SkillInDB, EducationInDB, ContractTypeInDB, WorkTypeInDB
 
 
-def get_position_catalog() -> List[PositionCatalog]:
+def get_position_catalog():
     query_tuple = ("SELECT * FROM position_catalog", None)
     result = db.execute_one(query_tuple)
-    return [PositionCatalog(**position) for position in result["result"]]
+    return [PositionInDB(**position) for position in result["result"]]
 
 
-def get_skills_catalog() -> List[SkillsCatalog]:
+def get_skills_catalog():
     query_tuple = ("SELECT * FROM skills_catalog", None)
     result = db.execute_one(query_tuple)
-    return [SkillsCatalog(**skill) for skill in result["result"]]
+    return [SkillInDB(**skill) for skill in result["result"]]
 
 
-def get_education_catalog() -> List[EducationCatalog]:
+def get_education_catalog():
     query_tuple = ("SELECT * FROM education_catalog", None)
     result = db.execute_one(query_tuple)
-    return [EducationCatalog(**education) for education in result["result"]]
+    return [EducationInDB(**education) for education in result["result"]]
 
 
-def get_contract_type_catalog() -> List[ContractTypeCatalog]:
+def get_contract_type_catalog():
     query_tuple = ("SELECT * FROM contract_type_catalog", None)
     result = db.execute_one(query_tuple)
-    return [ContractTypeCatalog(**contract_type) for contract_type in result["result"]]
+    return [ContractTypeInDB(**contract_type) for contract_type in result["result"]]
 
 
-def get_work_type_catalog() -> List[WorkTypeCatalog]:
+def get_work_type_catalog():
     query_tuple = ("SELECT * FROM work_type_catalog", None)
     result = db.execute_one(query_tuple)
-    return [WorkTypeCatalog(**work_type) for work_type in result["result"]]
+    return [WorkTypeInDB(**work_type) for work_type in result["result"]]
