@@ -13,7 +13,8 @@ from fastapi.security.utils import get_authorization_scheme_param
 
 
 from lavoro_api_gateway.helpers.auth_helpers import get_account
-from lavoro_library.models import Role, UserInDB, TokenData
+from lavoro_api_gateway.helpers.company_helpers import get_recruiter_profile
+from lavoro_library.models import RecruiterRole, Role, UserInDB, TokenData
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -31,7 +32,6 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
 
     async def __call__(self, request: Request) -> Optional[str]:
         authorization: str = request.cookies.get("access_token")
-        print("access_token is", authorization)
 
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
@@ -82,3 +82,29 @@ def get_current_applicant_user(current_user: Annotated[UserInDB, Depends(get_cur
     if not current_user.role == Role.applicant:
         raise HTTPException(status_code=400, detail="User is not an applicant")
     return current_user
+
+
+def get_current_recruiter_user(current_user: Annotated[UserInDB, Depends(get_current_active_user)]):
+    if not current_user.role == Role.recruiter:
+        raise HTTPException(status_code=400, detail="User is not a recruiter")
+    return current_user
+
+
+def get_current_company_admin_user(current_user: Annotated[UserInDB, Depends(get_current_recruiter_user)]):
+    """
+    There are two cases when this function will "pass" and return the current_user:
+    1. The current_user has an account role of "recruiter" and a recruiter_role of "admin"
+    2. The current_user has an account role of "recruiter" and doesn't have a recruiter_profile,
+    which means they haven't created a recruiter profile yet. This is the case when a recruiter
+    first registers with the system, but still has to create a recruiter profile
+    """
+
+    try:
+        recruiter_profile = get_recruiter_profile(current_user.id)
+    except HTTPException:
+        recruiter_profile = None
+
+    if not recruiter_profile or recruiter_profile.recruiter_role == RecruiterRole.admin:
+        return current_user
+
+    raise HTTPException(status_code=400, detail="User is not a company admin")
