@@ -21,6 +21,11 @@ def register_user(form_data: RegistrationForm):
     return propagate_response(response)
 
 
+def register_user_no_confirm(form_data: RegistrationForm):
+    response = requests.post("http://auth-api/register/no-confirm", data=jsonable_encoder(form_data))
+    return propagate_response(response)
+
+
 def confirm_email_with_token(verification_token: str):
     response = requests.post(f"http://auth-api/register/confirm/{verification_token}")
     return propagate_response(response)
