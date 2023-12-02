@@ -14,7 +14,7 @@ from lavoro_library.models import CreateApplicantProfileRequest, ApplicantProfil
 
 def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProfileRequest):
     response = requests.post(
-        f"http://applicant-api/applicant/create_applicant_profile/{account_id}",
+        f"http://applicant-api/applicant/create-applicant-profile/{account_id}",
         json=payload.model_dump(),
         headers={"Content-Type": "application/json"},
     )
@@ -22,7 +22,7 @@ def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProf
 
 
 def get_applicant_profile(account_id: uuid.UUID):
-    response = requests.get(f"http://applicant-api/applicant/get_applicant_profile/{account_id}")
+    response = requests.get(f"http://applicant-api/applicant/get-applicant-profile/{account_id}")
     if response.status_code >= 400:
         propagate_response(response)
 
