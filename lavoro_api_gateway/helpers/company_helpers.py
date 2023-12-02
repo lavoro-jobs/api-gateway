@@ -6,12 +6,18 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import EmailStr
 
 from lavoro_api_gateway.helpers.request_helpers import propagate_response
-from lavoro_library.models import CompanyInvitation, CreateCompanyRequest, RecruiterProfileInDB, RecruiterProfileWithCompanyName
+from lavoro_library.models import (
+    CompanyInvitation,
+    CreateCompanyRequest,
+    RecruiterProfileInDB,
+    RecruiterProfileWithCompanyName,
+    RecruiterRole,
+)
 
 
-def create_recruiter_profile(payload, account_id: uuid.UUID):
+def create_recruiter_profile(payload, account_id: uuid.UUID, recruiter_role: RecruiterRole):
     response = requests.post(
-        f"http://company-api/recruiter/create-recruiter-profile/{account_id}",
+        f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
