@@ -34,7 +34,8 @@ router = APIRouter(prefix="/company", tags=["company"])
 def create_recruiter(
     current_user: Annotated[UserInDB, Depends(get_current_company_admin_user)], payload: CreateRecruiterProfileRequest
 ):
-    return create_recruiter_profile(payload, current_user.id, RecruiterRole.admin)
+    recruiter_profile_request = CreateRecruiterProfileRequest(**payload.model_dump())
+    return create_recruiter_profile(recruiter_profile_request, current_user.id, RecruiterRole.admin)
 
 
 @router.post("/create-company")
@@ -53,7 +54,11 @@ def get_recruiter(current_user: Annotated[RecruiterProfileWithCompanyName, Depen
 def invite_recruiter(
     recruiter_profile: Annotated[RecruiterProfileInDB, Depends(get_recruiter_profile)], new_recruiter_email: str
 ):
-    return invite_recruiter_to_company(new_recruiter_email, recruiter_profile.company_id)
+    try:
+        user = get_account(new_recruiter_email)
+    except HTTPException as e:
+        return invite_recruiter_to_company(new_recruiter_email, recruiter_profile.company_id)
+    raise HTTPException(status_code=400, detail="User already exists")
 
 
 @router.post("/join-company/{invite_token}")
@@ -63,10 +68,7 @@ def join_company(invite_token: str, payload: JoinCompanyRequest):
     register_user_no_confirm(form_data)
     user = get_account(invitation.email)
     recruiter_profile_request = CreateRecruiterProfileRequest(
-        first_name=payload.first_name,
-        last_name=payload.last_name,
-        company_id=invitation.company_id,
-        recruiter_role=RecruiterRole.employee,
+        first_name=payload.first_name, last_name=payload.last_name, company_id=invitation.company_id
     )
     create_recruiter_profile(recruiter_profile_request, user.id, RecruiterRole.employee)
     delete_invite_token(invite_token)
