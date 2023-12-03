@@ -11,7 +11,7 @@ from lavoro_library.models import CreateApplicantProfileRequest, UserInDB
 router = APIRouter(prefix="/applicant", tags=["applicant"])
 
 
-@router.post("/create_applicant_profile", status_code=status.HTTP_201_CREATED)
+@router.post("/create-applicant-profile", status_code=status.HTTP_201_CREATED)
 def create_applicant(
     current_user: Annotated[UserInDB, Depends(get_current_applicant_user)],
     payload: CreateApplicantProfileRequest,
@@ -19,6 +19,6 @@ def create_applicant(
     return create_applicant_profile(current_user.id, payload)
 
 
-@router.get("/get_applicant_profile")
+@router.get("/get-applicant-profile")
 def get_applicant(current_user: Annotated[UserInDB, Depends(get_current_applicant_user)]):
     return get_applicant_profile(current_user.id)
