@@ -12,11 +12,11 @@ RUN curl -sS https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait
     && chmod +x /wait-for-it.sh
 
 # Library
-COPY ./lavoro-library/lavoro_library /devel/lavoro_library
 COPY ./lavoro-library/pre_install.sh /devel/pre_install.sh
-
 RUN chmod +x /devel/pre_install.sh
 RUN /devel/pre_install.sh
+
+COPY ./lavoro-library/lavoro_library /devel/lavoro_library
 
 COPY ./lavoro-api-gateway/lavoro_api_gateway /devel/lavoro_api_gateway
 
