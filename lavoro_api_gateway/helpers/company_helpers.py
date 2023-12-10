@@ -17,7 +17,7 @@ from lavoro_api_gateway.helpers.request_helpers import propagate_response
 # )
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.company_api.dtos import (
-    CreateRecruiterProfileDTO,
+    CreateRecruiterProfileWithCompanyDTO,
     CreateCompanyDTO,
     InviteTokenDTO,
     RecruiterProfileDTO,
@@ -25,7 +25,7 @@ from lavoro_library.model.company_api.dtos import (
 )
 
 
-def create_recruiter_profile(payload: CreateRecruiterProfileDTO, account_id: uuid.UUID, recruiter_role: RecruiterRole):
+def create_recruiter_profile(payload: CreateRecruiterProfileWithCompanyDTO, account_id: uuid.UUID, recruiter_role: RecruiterRole):
     response = requests.post(
         f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
         json=jsonable_encoder(payload),
