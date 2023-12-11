@@ -3,7 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 
 from lavoro_api_gateway.dependencies.auth_dependencies import get_current_active_user
-from lavoro_api_gateway.helpers.auth_helpers import get_token, confirm_email_with_token, register_user
+
+# from lavoro_api_gateway.helpers.auth_helpers import get_token, confirm_email_with_token, register_user
 from lavoro_api_gateway.services import auth_service
 
 

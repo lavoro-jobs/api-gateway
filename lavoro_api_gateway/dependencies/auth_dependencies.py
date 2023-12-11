@@ -12,15 +12,17 @@ from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 
 
-from lavoro_api_gateway.helpers.auth_helpers import get_account
-from lavoro_api_gateway.helpers.company_helpers import get_recruiter_profile
+from lavoro_api_gateway import common
+
+# from lavoro_api_gateway.helpers.auth_helpers import get_account
+# from lavoro_api_gateway.helpers.company_helpers import get_recruiter_profile
 
 # from lavoro_library.models import RecruiterRole, Role, UserInDB, TokenData
 
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.db_models import Account
-from lavoro_library.model.auth_api.dtos import TokenDataDTO, TokenDTO
+from lavoro_library.model.auth_api.dtos import TokenDataDTO
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -72,7 +74,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenDataDTO(email=email)
     except JWTError:
         raise credentials_exception
-    user = get_account(email=token_data.email)
+    user = common.get_account(email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
@@ -106,7 +108,7 @@ def get_current_company_admin_user(current_user: Annotated[Account, Depends(get_
     """
 
     try:
-        recruiter_profile = get_recruiter_profile(current_user.id)
+        recruiter_profile = common.get_recruiter_profile(current_user.id)
     except HTTPException:
         recruiter_profile = None
 
