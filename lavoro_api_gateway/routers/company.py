@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from lavoro_api_gateway.dependencies.auth_dependencies import get_current_company_admin_user, get_current_recruiter_user
 from lavoro_api_gateway.dependencies.company_dependencies import get_recruiter_profile
 from lavoro_api_gateway.helpers.company_helpers import (
+    add_recruiter_to_company,
     check_invite_token,
     create_company_profile,
     create_recruiter_profile,
@@ -17,6 +18,7 @@ from lavoro_api_gateway.helpers.auth_helpers import register_user_no_confirm, ge
 from lavoro_library.models import (
     CreateCompanyRequest,
     CreateRecruiterProfileRequest,
+    CreateRecruiterProfileWithCompanyRequest,
     JoinCompanyRequest,
     RecruiterProfileInDB,
     RecruiterProfileWithCompanyName,
@@ -67,7 +69,7 @@ def join_company(invite_token: str, payload: JoinCompanyRequest):
     form_data = RegistrationForm(email=invitation.email, password=payload.password, role=Role.recruiter)
     register_user_no_confirm(form_data)
     user = get_account(invitation.email)
-    recruiter_profile_request = CreateRecruiterProfileRequest(
+    recruiter_profile_request = CreateRecruiterProfileWithCompanyRequest(
         first_name=payload.first_name, last_name=payload.last_name, company_id=invitation.company_id
     )
     create_recruiter_profile(recruiter_profile_request, user.id, RecruiterRole.employee)
