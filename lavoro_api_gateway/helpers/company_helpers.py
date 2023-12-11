@@ -25,7 +25,9 @@ from lavoro_library.model.company_api.dtos import (
 )
 
 
-def create_recruiter_profile(payload: CreateRecruiterProfileWithCompanyDTO, account_id: uuid.UUID, recruiter_role: RecruiterRole):
+def create_recruiter_profile(
+    payload: CreateRecruiterProfileWithCompanyDTO, account_id: uuid.UUID, recruiter_role: RecruiterRole
+):
     response = requests.post(
         f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
         json=jsonable_encoder(payload),
@@ -63,7 +65,7 @@ def invite_recruiter_to_company(new_recruiter_email: EmailStr, company_id: uuid.
 def check_invite_token(invite_token: str):
     response = requests.get(
         f"http://company-api/recruiter/can-join-company/{invite_token}",
-    )
+    )  # maybe this should be renamed to get-invite-token rather than can-join-company
     return propagate_response(response, response_model=InviteTokenDTO)
 
 
