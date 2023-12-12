@@ -1,0 +1,88 @@
+import uuid
+from fastapi import HTTPException
+from pydantic import EmailStr
+import requests
+
+from fastapi.encoders import jsonable_encoder
+
+from lavoro_api_gateway.common import get_account
+from lavoro_api_gateway.helpers.request_helpers import propagate_response
+from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
+from lavoro_library.model.auth_api.dtos import RegisterDTO
+from lavoro_library.model.company_api.db_models import RecruiterRole
+from lavoro_library.model.company_api.dtos import (
+    CreateRecruiterProfileDTO,
+    CreateRecruiterProfileWithCompanyDTO,
+    InviteTokenDTO,
+    RecruiterProfileDTO,
+    RecruiterProfileWithCompanyNameDTO,
+)
+from lavoro_library.models import Role
+
+
+def create_recruiter_profile(account_id: uuid.UUID, recruiter_role: RecruiterRole, payload: CreateRecruiterProfileDTO):
+    response = requests.post(
+        f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def get_recruiter_profile(account_id: uuid.UUID):
+    response = requests.get(f"http://company-api/recruiter/get-recruiter-profile/{account_id}")
+    return propagate_response(response, response_model=RecruiterProfileDTO)
+
+
+def get_recruiter_profile_with_company_name(account_id: uuid.UUID):
+    response = requests.get(f"http://company-api/recruiter/get-recruiter-profile-with-company-name/{account_id}")
+    return propagate_response(response, response_model=RecruiterProfileWithCompanyNameDTO)
+
+
+def create_company(account_id: uuid.UUID, payload):
+    response = requests.post(
+        f"http://company-api/company/create-company/{account_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
+    user = None
+    try:
+        user = get_account(company_id)
+    except HTTPException as e:
+        pass
+
+    if user:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    response = requests.post(
+        f"http://company-api/company/invite-recruiter/{company_id}/{new_recruiter_email}",
+    )
+    return propagate_response(response)
+
+
+def join_company(invite_token: str, payload: JoinCompanyDTO):
+    invitation_response = requests.get(f"http://company-api/recruiter/can-join-company/{invite_token}")
+    invitation = propagate_response(invitation_response, response_model=InviteTokenDTO)
+    register_request = RegisterDTO(email=invitation.email, password=payload.password, role=Role.recruiter)
+    register_response = requests.post(
+        f"http://auth-api/register/no-confirm",
+        data=jsonable_encoder(register_request),
+    )
+    propagate_response(register_response)
+    user = get_account(invitation.email)
+    create_recruiter_profile_request = CreateRecruiterProfileWithCompanyDTO(
+        company_id=invitation.company_id, first_name=payload.first_name, last_name=payload.last_name
+    )
+    create_recruiter_profile_response = requests.post(
+        f"http://company-api/recruiter/create-recruiter-profile/{user.id}/{RecruiterRole.employee}",
+        json=jsonable_encoder(create_recruiter_profile_request),
+        headers={"Content-Type": "application/json"},
+    )
+    delete_invite_token_response = requests.delete(f"http://company-api/company/delete-invite-token/{invite_token}")
+    propagate_response(create_recruiter_profile_response)
+    propagate_response(delete_invite_token_response)
+    return
