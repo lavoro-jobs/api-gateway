@@ -1,10 +1,8 @@
-import uuid
-from pydantic import EmailStr
 import requests
 
 from fastapi.encoders import jsonable_encoder
 
-from lavoro_api_gateway.helpers.request_helpers import propagate_response
+from lavoro_api_gateway.common import propagate_response
 from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.auth_api.dtos import LoginDTO, RegisterDTO, TokenDTO
 
