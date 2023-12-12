@@ -12,7 +12,13 @@ from lavoro_api_gateway.database.queries import (
 )
 from lavoro_api_gateway.helpers.request_helpers import propagate_response
 
-from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, CreateApplicantProfileDTO, ExperienceDTO
+from lavoro_library.model.applicant_api.dtos import (
+    ApplicantProfileDTO,
+    CreateApplicantProfileDTO,
+    ExperienceDTO,
+    UpdateApplicantExperienceDTO,
+    UpdateApplicantProfileDTO,
+)
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile
 
 
@@ -81,3 +87,28 @@ def get_applicant_profile(account_id: uuid.UUID):
     hydrated_applicant_profile.experiences = experiences
 
     return hydrated_applicant_profile
+
+
+def update_applicant_profile(account_id: uuid.UUID, payload: UpdateApplicantProfileDTO):
+    response = requests.patch(
+        f"http://applicant-api/applicant/update-applicant-profile/{account_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def update_applicant_experience(experience_id: uuid.UUID, payload: UpdateApplicantExperienceDTO):
+    response = requests.patch(
+        f"http://applicant-api/applicant/update-applicant-experience/{experience_id}", json=jsonable_encoder(payload)
+    )
+    if response.status_code >= 400:
+        propagate_response(response)
+    return response.json()
+
+
+def delete_applicant_experience(experience_id: uuid.UUID):
+    response = requests.delete(f"http://applicant-api/applicant/delete-applicant-experience/{experience_id}")
+    if response.status_code >= 400:
+        propagate_response(response)
+    return response.json()
