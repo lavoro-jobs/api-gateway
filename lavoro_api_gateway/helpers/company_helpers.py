@@ -69,11 +69,11 @@ def check_invite_token(invite_token: str):
     return propagate_response(response, response_model=InviteTokenDTO)
 
 
-def add_recruiter_to_company(account_id: uuid.UUID, company_id: uuid.UUID):
-    response = requests.post(
-        f"http://company-api/recruiter/join-company/{company_id}/{account_id}",
-    )
-    return propagate_response(response)
+# def add_recruiter_to_company(account_id: uuid.UUID, company_id: uuid.UUID):
+#     response = requests.post(
+#         f"http://company-api/recruiter/join-company/{company_id}/{account_id}",
+#     )
+#     return propagate_response(response)
 
 
 def delete_invite_token(invite_token: str):
