@@ -1,4 +1,5 @@
 from typing import Annotated
+import uuid
 
 from fastapi import APIRouter, Depends, status
 
@@ -6,7 +7,6 @@ from lavoro_api_gateway.dependencies.auth_dependencies import get_current_applic
 
 from lavoro_api_gateway.services import applicant_service
 
-# from lavoro_library.models import CreateApplicantProfileRequest, UserInDB
 from lavoro_library.model.applicant_api.dtos import (
     CreateApplicantProfileDTO,
     UpdateApplicantExperienceDTO,
@@ -28,7 +28,6 @@ def create_applicant_profile(
 @router.get("/get-applicant-profile")
 def get_applicant_profile(current_user: Annotated[Account, Depends(get_current_applicant_user)]):
     return applicant_service.get_applicant_profile(current_user.id)
-    # return get_applicant_profile(current_user.id)
 
 
 @router.patch("/update-applicant-profile", status_code=status.HTTP_200_OK)
