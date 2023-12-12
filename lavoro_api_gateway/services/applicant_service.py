@@ -1,3 +1,4 @@
+from typing import List
 import uuid
 import requests
 
@@ -14,7 +15,8 @@ from lavoro_api_gateway.common import propagate_response
 
 from lavoro_library.model.applicant_api.dtos import (
     ApplicantProfileDTO,
-    CreateApplicantProfileDTO,
+    CreateApplicantProfileWithExperiencesDTO,
+    CreateExperienceDTO,
     ExperienceDTO,
     UpdateApplicantExperienceDTO,
     UpdateApplicantProfileDTO,
@@ -22,13 +24,36 @@ from lavoro_library.model.applicant_api.dtos import (
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile
 
 
-def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProfileDTO):
-    response = requests.post(
+def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProfileWithExperiencesDTO):
+    create_applicant_profile_dto = payload.model_dump(exclude={"experiences"})
+
+    applicant_profile_response = requests.post(
         f"http://applicant-api/applicant/create-applicant-profile/{account_id}",
+        json=jsonable_encoder(create_applicant_profile_dto),
+        headers={"Content-Type": "application/json"},
+    )
+    propagate_response(applicant_profile_response)
+
+    if payload.experiences:
+        create_experiences_dto = payload.experiences
+        experiences_response = requests.post(
+            f"http://applicant-api/applicant/create-experiences/{account_id}",
+            json=jsonable_encoder(create_experiences_dto),
+            headers={"Content-Type": "application/json"},
+        )
+        propagate_response(experiences_response)
+
+    return {"detail": "Applicant profile created"}
+
+
+def create_experiences(account_id: uuid.UUID, payload: List[CreateExperienceDTO]):
+    response = requests.post(
+        f"http://applicant-api/applicant/create-experiences/{account_id}",
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
-    return propagate_response(response)
+    propagate_response(response)
+    return {"detail": "Applicant experiences created"}
 
 
 def get_applicant_profile(account_id: uuid.UUID):
@@ -58,7 +83,7 @@ def get_applicant_profile(account_id: uuid.UUID):
         "education_level": None,
         "work_type": None,
         "contract_type": None,
-        "seniority_level": 1,  # TODO: implement seniority level #PROJR-60
+        "seniority_level": 1,
     }
 
     for position in position_catalog:

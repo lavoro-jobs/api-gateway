@@ -1,5 +1,5 @@
-from typing import Annotated
 import uuid
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
 
@@ -8,7 +8,8 @@ from lavoro_api_gateway.dependencies.auth_dependencies import get_current_applic
 from lavoro_api_gateway.services import applicant_service
 
 from lavoro_library.model.applicant_api.dtos import (
-    CreateApplicantProfileDTO,
+    CreateExperienceDTO,
+    CreateApplicantProfileWithExperiencesDTO,
     UpdateApplicantExperienceDTO,
     UpdateApplicantProfileDTO,
 )
@@ -20,9 +21,17 @@ router = APIRouter(prefix="/applicant", tags=["applicant"])
 @router.post("/create-applicant-profile", status_code=status.HTTP_201_CREATED)
 def create_applicant_profile(
     current_user: Annotated[Account, Depends(get_current_applicant_user)],
-    payload: CreateApplicantProfileDTO,
+    payload: CreateApplicantProfileWithExperiencesDTO,
 ):
     return applicant_service.create_applicant_profile(current_user.id, payload)
+
+
+@router.post("/create-experiences", status_code=status.HTTP_201_CREATED)
+def create_experiences(
+    current_user: Annotated[Account, Depends(get_current_applicant_user)],
+    payload: List[CreateExperienceDTO],
+):
+    return applicant_service.create_experiences(current_user.id, payload)
 
 
 @router.get("/get-applicant-profile")
