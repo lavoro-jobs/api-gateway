@@ -7,6 +7,7 @@ from fastapi.encoders import jsonable_encoder
 
 from lavoro_api_gateway.common import get_account, propagate_response
 from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
+from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.dtos import RegisterDTO
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.company_api.dtos import (
@@ -15,7 +16,6 @@ from lavoro_library.model.company_api.dtos import (
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
 )
-from lavoro_library.models import Role
 
 
 def create_recruiter_profile(account_id: uuid.UUID, recruiter_role: RecruiterRole, payload: CreateRecruiterProfileDTO):
