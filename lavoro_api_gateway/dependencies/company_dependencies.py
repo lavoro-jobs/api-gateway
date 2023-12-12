@@ -5,7 +5,6 @@ from fastapi import Depends
 from lavoro_api_gateway import common
 from lavoro_api_gateway.dependencies.auth_dependencies import get_current_recruiter_user
 
-# from lavoro_library.models import UserInDB, RecruiterProfileInDB
 from lavoro_library.model.auth_api.db_models import Account
 
 

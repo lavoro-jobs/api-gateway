@@ -1,8 +1,5 @@
-from typing import List
-
 from lavoro_api_gateway.database import db
 
-# from lavoro_library.models import PositionInDB, SkillInDB, EducationInDB, ContractTypeInDB, WorkTypeInDB
 
 from lavoro_library.model.api_gateway.dtos import (
     ContractTypeDTO,

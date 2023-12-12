@@ -10,7 +10,7 @@ from lavoro_api_gateway.database.queries import (
     get_work_type_catalog,
     get_contract_type_catalog,
 )
-from lavoro_api_gateway.helpers.request_helpers import propagate_response
+from lavoro_api_gateway.common import propagate_response
 
 from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, CreateApplicantProfileDTO, ExperienceDTO
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile
