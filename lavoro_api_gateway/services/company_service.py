@@ -12,7 +12,7 @@ from lavoro_library.model.auth_api.dtos import RegisterDTO
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.company_api.dtos import (
     CreateRecruiterProfileDTO,
-    CreateRecruiterProfileWithCompanyDTO,
+    # CreateRecruiterProfileWithCompanyDTO,
     InviteTokenDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
@@ -65,7 +65,7 @@ def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
 
 
 def join_company(invite_token: str, payload: JoinCompanyDTO):
-    invitation_response = requests.get(f"http://company-api/recruiter/can-join-company/{invite_token}")
+    invitation_response = requests.get(f"http://company-api/recruiter/get-invitation/{invite_token}")
     invitation = propagate_response(invitation_response, response_model=InviteTokenDTO)
     register_request = RegisterDTO(email=invitation.email, password=payload.password, role=Role.recruiter)
     register_response = requests.post(
@@ -74,7 +74,7 @@ def join_company(invite_token: str, payload: JoinCompanyDTO):
     )
     propagate_response(register_response)
     user = get_account(invitation.email)
-    create_recruiter_profile_request = CreateRecruiterProfileWithCompanyDTO(
+    create_recruiter_profile_request = CreateRecruiterProfileDTO(
         company_id=invitation.company_id, first_name=payload.first_name, last_name=payload.last_name
     )
     create_recruiter_profile_response = requests.post(
