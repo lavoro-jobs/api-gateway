@@ -24,7 +24,6 @@ def create_applicant_profile(
     payload: CreateApplicantProfileWithExperiencesDTO,
 ):
     return applicant_service.create_applicant_profile(current_user.id, payload)
-    # return create_applicant_profile(current_user.id, payload)
 
 
 @router.post("/create-experiences", status_code=status.HTTP_201_CREATED)
@@ -33,7 +32,6 @@ def create_experiences(
     payload: List[CreateExperienceDTO],
 ):
     return applicant_service.create_experiences(current_user.id, payload)
-    # return create_experiences(current_user.id, payload)
 
 
 @router.get("/get-applicant-profile")
