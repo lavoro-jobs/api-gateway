@@ -2,23 +2,7 @@ from fastapi import APIRouter
 
 from typing import List
 
-# from lavoro_api_gateway.database.queries import (
-#     get_position_catalog,
-#     get_skills_catalog,
-#     get_education_catalog,
-#     get_contract_type_catalog,
-#     get_work_type_catalog,
-# )
-
 from lavoro_api_gateway.services import config_service
-
-# from lavoro_library.models import (
-#     PositionInDB,
-#     SkillInDB,
-#     EducationInDB,
-#     ContractTypeInDB,
-#     WorkTypeInDB,
-# )
 
 from lavoro_library.model.api_gateway.dtos import (
     ContractTypeDTO,

@@ -14,11 +14,6 @@ from fastapi.security.utils import get_authorization_scheme_param
 
 from lavoro_api_gateway import common
 
-# from lavoro_api_gateway.helpers.auth_helpers import get_account
-# from lavoro_api_gateway.helpers.company_helpers import get_recruiter_profile
-
-# from lavoro_library.models import RecruiterRole, Role, UserInDB, TokenData
-
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.db_models import Account
