@@ -4,13 +4,7 @@ import requests
 
 from fastapi.encoders import jsonable_encoder
 
-from lavoro_api_gateway.database.queries import (
-    get_education_catalog,
-    get_position_catalog,
-    get_skills_catalog,
-    get_work_type_catalog,
-    get_contract_type_catalog,
-)
+from lavoro_api_gateway.common import fill_database_model_with_catalog_data
 from lavoro_api_gateway.common import propagate_response
 
 from lavoro_library.model.applicant_api.dtos import (
@@ -21,7 +15,7 @@ from lavoro_library.model.applicant_api.dtos import (
     UpdateApplicantExperienceDTO,
     UpdateApplicantProfileDTO,
 )
-from lavoro_library.model.applicant_api.db_models import ApplicantProfile
+from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
 
 
 def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProfileWithExperiencesDTO):
@@ -58,58 +52,20 @@ def create_experiences(account_id: uuid.UUID, payload: List[CreateExperienceDTO]
 
 def get_applicant_profile(account_id: uuid.UUID):
     applicant_profile_response = requests.get(f"http://applicant-api/applicant/get-applicant-profile/{account_id}")
-    if applicant_profile_response.status_code >= 400:
-        propagate_response(applicant_profile_response)
+    applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
 
     experiences_response = requests.get(f"http://applicant-api/applicant/get-experiences/{account_id}")
-    if experiences_response.status_code == 404:
-        experiences = []
-    elif experiences_response.status_code >= 400:
-        propagate_response(experiences_response)
-    else:
-        experiences = [ExperienceDTO(**experience) for experience in experiences_response.json()]
+    experiences = propagate_response(experiences_response)
 
-    applicant_profile = ApplicantProfile(**applicant_profile_response.json())
+    hydrated_applicant_profile: ApplicantProfileDTO = fill_database_model_with_catalog_data(
+        applicant_profile, ApplicantProfileDTO
+    )
+    hydrated_experiences: List[ExperienceDTO] = []
+    for experience in experiences:
+        hydrated_experience = fill_database_model_with_catalog_data(Experience(**experience), ExperienceDTO)
+        hydrated_experiences.append(hydrated_experience)
 
-    position_catalog = get_position_catalog()
-    skills_catalog = get_skills_catalog()
-    education_catalog = get_education_catalog()
-    work_type_catalog = get_work_type_catalog()
-    contract_type_catalog = get_contract_type_catalog()
-
-    additional_info = {
-        "position": None,
-        "skills": [],
-        "education_level": None,
-        "work_type": None,
-        "contract_type": None,
-        "seniority_level": 1,
-    }
-
-    for position in position_catalog:
-        if position.id == applicant_profile.position_id:
-            additional_info["position"] = position
-
-    for skill in skills_catalog:
-        if skill.id in applicant_profile.skill_ids:
-            additional_info["skills"].append(skill)
-
-    for education in education_catalog:
-        if education.id == applicant_profile.education_level_id:
-            additional_info["education_level"] = education
-
-    for work_type in work_type_catalog:
-        if work_type.id == applicant_profile.work_type_id:
-            additional_info["work_type"] = work_type
-
-    for contract_type in contract_type_catalog:
-        if contract_type.id == applicant_profile.contract_type_id:
-            additional_info["contract_type"] = contract_type
-
-    applicant_profile_dict = applicant_profile.model_dump()
-    applicant_profile_dict.update(additional_info)
-    hydrated_applicant_profile = ApplicantProfileDTO(**applicant_profile_dict)
-    hydrated_applicant_profile.experiences = experiences
+    hydrated_applicant_profile.experiences = hydrated_experiences
 
     return hydrated_applicant_profile
 

@@ -5,15 +5,16 @@ import requests
 
 from fastapi.encoders import jsonable_encoder
 
-from lavoro_api_gateway.common import get_account, propagate_response
+from lavoro_api_gateway.common import fill_database_model_with_catalog_data, get_account, propagate_response
 from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
 from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.dtos import RegisterDTO
-from lavoro_library.model.company_api.db_models import RecruiterRole
+from lavoro_library.model.company_api.db_models import JobPost, RecruiterRole
 from lavoro_library.model.company_api.dtos import (
     CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     InviteTokenDTO,
+    JobPostDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
 )
@@ -99,7 +100,13 @@ def create_job_post(company_id: uuid.UUID, recruiter_account_id: uuid.UUID, payl
 
 def get_job_posts_by_company(company_id: uuid.UUID):
     response = requests.get(f"http://company-api/job-post/get-job-posts-by-company/{company_id}")
-    return propagate_response(response)
+    job_posts = propagate_response(response)
+    hydrated_job_posts = []
+    for job_post in job_posts:
+        hydrated_job_post = fill_database_model_with_catalog_data(JobPost(**job_post), JobPostDTO)
+        hydrated_job_posts.append(hydrated_job_post)
+
+    return hydrated_job_posts
 
 
 def get_job_posts_by_recruiter(recruiter_account_id: uuid.UUID):
