@@ -11,6 +11,7 @@ from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.dtos import RegisterDTO
 from lavoro_library.model.company_api.db_models import RecruiterRole
 from lavoro_library.model.company_api.dtos import (
+    CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     InviteTokenDTO,
     RecruiterProfileDTO,
@@ -84,3 +85,23 @@ def join_company(invite_token: str, payload: JoinCompanyDTO):
     propagate_response(create_recruiter_profile_response)
     propagate_response(delete_invite_token_response)
     return
+
+
+def create_job_post(company_id: uuid.UUID, recruiter_account_id: uuid.UUID, payload: CreateJobPostDTO):
+    payload.assignees.append(recruiter_account_id)
+    response = requests.post(
+        f"http://company-api/job-post/create-job-post/{company_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def get_job_posts_by_company(company_id: uuid.UUID):
+    response = requests.get(f"http://company-api/job-post/get-job-posts-by-company/{company_id}")
+    return propagate_response(response)
+
+
+def get_job_posts_by_recruiter(recruiter_account_id: uuid.UUID):
+    response = requests.get(f"http://company-api/job-post/get-job-posts-by-recruiter/{recruiter_account_id}")
+    return propagate_response(response)
