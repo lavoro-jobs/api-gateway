@@ -4,17 +4,17 @@ from fastapi import APIRouter, Depends
 from pydantic import EmailStr
 
 from lavoro_api_gateway.dependencies.auth_dependencies import get_current_company_admin_user, get_current_recruiter_user
-from lavoro_api_gateway.dependencies.company_dependencies import get_recruiter_profile
+from lavoro_api_gateway.dependencies.company_dependencies import get_recruiter_profile, get_admin_recruiter_profile
 
 
-from lavoro_api_gateway.services import auth_service, company_service
+from lavoro_api_gateway.services import company_service
 
 
-from lavoro_library.model.auth_api.db_models import Account, Role
-from lavoro_library.model.auth_api.dtos import RegisterDTO
+from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
 from lavoro_library.model.company_api.db_models import RecruiterProfile, RecruiterRole
 from lavoro_library.model.company_api.dtos import (
+    CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     CreateCompanyDTO,
 )
@@ -52,3 +52,25 @@ def invite_recruiter(
 @router.post("/join-company/{invite_token}")
 def join_company(invite_token: str, payload: JoinCompanyDTO):
     return company_service.join_company(invite_token, payload)
+
+
+@router.post("/create-job-post")
+def create_job_post(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+    payload: CreateJobPostDTO,
+):
+    return company_service.create_job_post(recruiter_profile.company_id, recruiter_profile.account_id, payload)
+
+
+@router.get("/get-job-posts-by-company")
+def get_job_posts_by_company(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_admin_recruiter_profile)],
+):
+    return company_service.get_job_posts_by_company(recruiter_profile.company_id)
+
+
+@router.get("/get-job-posts-by-recruiter")
+def get_job_posts_by_recruiter(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+):
+    return company_service.get_job_posts_by_recruiter(recruiter_profile.account_id)
