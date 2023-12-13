@@ -44,7 +44,7 @@ def get_recruiter(current_user: Annotated[Account, Depends(get_current_recruiter
 
 @router.post("/invite-recruiter/{new_recruiter_email}")
 def invite_recruiter(
-    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)], new_recruiter_email: EmailStr
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_admin_recruiter_profile)], new_recruiter_email: EmailStr
 ):
     return company_service.invite_recruiter(recruiter_profile.company_id, new_recruiter_email)
 
