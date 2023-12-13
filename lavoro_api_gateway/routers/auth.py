@@ -35,3 +35,9 @@ def register(form_data: Annotated[RegisterDTO, Depends()]):
 @router.post("/register/confirm/{verification_token}")
 def confirm_email(verification_token: str):
     return auth_service.confirm_email(verification_token)
+
+
+@router.post("/logout")
+def sign_out(response: Response):
+    response.delete_cookie(key="access_token")
+    return {"detail": "Signed out"}
