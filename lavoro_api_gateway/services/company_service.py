@@ -122,7 +122,7 @@ def create_job_post(company_id: uuid.UUID, recruiter_account_id: uuid.UUID, payl
 def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
     response = requests.post(
         f"http://company-api/job-post/create-assignees/{job_post_id}",
-        json=jsonable_encoder(payload),
+        json=jsonable_encoder(payload.assignees),
         headers={"Content-Type": "application/json"},
     )
     return propagate_response(response)
