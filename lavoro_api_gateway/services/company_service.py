@@ -15,8 +15,10 @@ from lavoro_api_gateway.common import (
 from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
 from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.dtos import RegisterDTO
-from lavoro_library.model.company_api.db_models import Assignee, JobPost, RecruiterRole
+from lavoro_library.model.company_api.db_models import Assignee, JobPost, RecruiterProfile, RecruiterRole
 from lavoro_library.model.company_api.dtos import (
+    CompanyDTO,
+    CompanyWithRecruitersDTO,
     CreateAssigneesDTO,
     CreateJobPostWithAssigneesDTO,
     CreateRecruiterProfileDTO,
@@ -24,12 +26,22 @@ from lavoro_library.model.company_api.dtos import (
     JobPostDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
+    UpdateRecruiterProfileDTO,
 )
 
 
 def create_recruiter_profile(account_id: uuid.UUID, recruiter_role: RecruiterRole, payload: CreateRecruiterProfileDTO):
     response = requests.post(
         f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def update_recruiter_profile(account_id: uuid.UUID, payload: UpdateRecruiterProfileDTO):
+    response = requests.patch(
+        f"http://company-api/recruiter/update-recruiter-profile/{account_id}",
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
@@ -53,6 +65,22 @@ def create_company(account_id: uuid.UUID, payload):
         headers={"Content-Type": "application/json"},
     )
     return propagate_response(response)
+
+
+def get_company(company_id: uuid.UUID):
+    response = requests.get(f"http://company-api/company/get-company/{company_id}")
+    return propagate_response(response, CompanyDTO)
+
+
+def get_company_with_recruiters(company_id: uuid.UUID):
+    company_response = requests.get(f"http://company-api/company/get-company/{company_id}")
+    company = propagate_response(company_response, response_model=CompanyWithRecruitersDTO)
+
+    recruiters_response = requests.get(f"http://company-api/recruiter/get-recruiters-by-company/{company_id}")
+    recruiters = propagate_response(recruiters_response)
+
+    company.recruiters = recruiters
+    return company
 
 
 def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
@@ -129,16 +157,40 @@ def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
 
 
 def get_job_posts_by_company(company_id: uuid.UUID):
-    response = requests.get(f"http://company-api/job-post/get-job-posts-by-company/{company_id}")
-    job_posts = propagate_response(response)
+    job_posts_response = requests.get(f"http://company-api/job-post/get-job-posts-by-company/{company_id}")
+    job_posts = propagate_response(job_posts_response)
+    job_posts = [JobPost(**job_post) for job_post in job_posts]
+
     hydrated_job_posts = []
     for job_post in job_posts:
-        hydrated_job_post = fill_database_model_with_catalog_data(JobPost(**job_post), JobPostDTO)
+        assignees_response = requests.get(f"http://company-api/job-post/get-assignees/{job_post.id}")
+        assignees = propagate_response(assignees_response)
+        assignees = [RecruiterProfile(**assignee) for assignee in assignees]
+
+        hydrated_job_post: JobPostDTO = fill_database_model_with_catalog_data(
+            JobPost(**job_post.model_dump()), JobPostDTO
+        )
+        hydrated_job_post.assignees = assignees
         hydrated_job_posts.append(hydrated_job_post)
 
     return hydrated_job_posts
 
 
 def get_job_posts_by_recruiter(recruiter_account_id: uuid.UUID):
-    response = requests.get(f"http://company-api/job-post/get-job-posts-by-recruiter/{recruiter_account_id}")
-    return propagate_response(response)
+    job_posts_response = requests.get(f"http://company-api/job-post/get-job-posts-by-recruiter/{recruiter_account_id}")
+    job_posts = propagate_response(job_posts_response)
+    job_posts = [JobPost(**job_post) for job_post in job_posts]
+
+    hydrated_job_posts = []
+    for job_post in job_posts:
+        assignees_response = requests.get(f"http://company-api/job-post/get-assignees/{job_post.id}")
+        assignees = propagate_response(assignees_response)
+        assignees = [RecruiterProfile(**assignee) for assignee in assignees]
+
+        hydrated_job_post: JobPostDTO = fill_database_model_with_catalog_data(
+            JobPost(**job_post.model_dump()), JobPostDTO
+        )
+        hydrated_job_post.assignees = assignees
+        hydrated_job_posts.append(hydrated_job_post)
+
+    return hydrated_job_posts
