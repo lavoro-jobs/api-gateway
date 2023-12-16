@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from pydantic import EmailStr
 
 from lavoro_api_gateway.dependencies.auth_dependencies import get_current_company_admin_user, get_current_recruiter_user
@@ -17,6 +17,7 @@ from lavoro_library.model.company_api.dtos import (
     CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     CreateCompanyDTO,
+    UpdateRecruiterProfileDTO,
 )
 
 
@@ -28,6 +29,14 @@ def create_recruiter_profile(
     current_user: Annotated[Account, Depends(get_current_company_admin_user)], payload: CreateRecruiterProfileDTO
 ):
     return company_service.create_recruiter_profile(current_user.id, RecruiterRole.admin, payload)
+
+
+@router.patch("/update-recruiter-profile", status_code=status.HTTP_200_OK)
+def update_recruiter_profile(
+    current_user: Annotated[Account, Depends(get_current_recruiter_user)],
+    payload: UpdateRecruiterProfileDTO,
+):
+    return company_service.update_recruiter_profile(current_user.id, payload)
 
 
 @router.post("/create-company")

@@ -29,6 +29,16 @@ def create_recruiter_profile(account_id: uuid.UUID, recruiter_role: RecruiterRol
     return propagate_response(response)
 
 
+def update_recruiter_profile(account_id: uuid.UUID, payload: CreateRecruiterProfileDTO):
+    response = requests.patch(
+        f"http://company-api/recruiter/update-recruiter-profile/{account_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    print("prosloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+    return propagate_response(response)
+
+
 def get_recruiter_profile(account_id: uuid.UUID):
     response = requests.get(f"http://company-api/recruiter/get-recruiter-profile/{account_id}")
     return propagate_response(response, response_model=RecruiterProfileDTO)
