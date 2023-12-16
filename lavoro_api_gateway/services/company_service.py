@@ -17,12 +17,22 @@ from lavoro_library.model.company_api.dtos import (
     JobPostDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
+    UpdateRecruiterProfileDTO,
 )
 
 
 def create_recruiter_profile(account_id: uuid.UUID, recruiter_role: RecruiterRole, payload: CreateRecruiterProfileDTO):
     response = requests.post(
         f"http://company-api/recruiter/create-recruiter-profile/{account_id}/{recruiter_role}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
+
+
+def update_recruiter_profile(account_id: uuid.UUID, payload: UpdateRecruiterProfileDTO):
+    response = requests.patch(
+        f"http://company-api/recruiter/update-recruiter-profile/{account_id}",
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
