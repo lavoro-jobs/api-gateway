@@ -35,7 +35,6 @@ def update_recruiter_profile(account_id: uuid.UUID, payload: CreateRecruiterProf
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
-    print("prosloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     return propagate_response(response)
 
 
