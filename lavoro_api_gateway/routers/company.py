@@ -53,6 +53,13 @@ def get_company(
     return company_service.get_company(recruiter_profile.company_id)
 
 
+@router.get("/get-company-with-recruiters")
+def get_company_with_recruiters(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+):
+    return company_service.get_company_with_recruiters(recruiter_profile.company_id)
+
+
 @router.get("/get-recruiter-profile")
 def get_recruiter(current_user: Annotated[Account, Depends(get_current_recruiter_user)]):
     return company_service.get_recruiter_profile_with_company_name(current_user.id)
