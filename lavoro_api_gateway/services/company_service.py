@@ -48,8 +48,8 @@ def create_company(account_id: uuid.UUID, payload):
     return propagate_response(response)
 
 
-def get_company_by_recruiter(recruiter_account_id: uuid.UUID):
-    response = requests.get(f"http://company-api/company/get-company-by-recruiter/{recruiter_account_id}")
+def get_company(company_id: uuid.UUID):
+    response = requests.get(f"http://company-api/company/get-company/{company_id}")
     return propagate_response(response)
 
 

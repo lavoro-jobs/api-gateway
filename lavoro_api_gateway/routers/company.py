@@ -37,11 +37,11 @@ def create_company(
     return company_service.create_company(current_user.id, payload)
 
 
-@router.get("/get-company-by-recruiter")
-def get_company_by_recruiter(
+@router.get("/get-company")
+def get_company(
     recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
 ):
-    return company_service.get_company_by_recruiter(recruiter_profile.account_id)
+    return company_service.get_company(recruiter_profile.company_id)
 
 
 @router.get("/get-recruiter-profile")
