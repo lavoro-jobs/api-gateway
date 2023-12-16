@@ -11,6 +11,8 @@ from lavoro_library.model.auth_api.db_models import Role
 from lavoro_library.model.auth_api.dtos import RegisterDTO
 from lavoro_library.model.company_api.db_models import JobPost, RecruiterRole
 from lavoro_library.model.company_api.dtos import (
+    CompanyDTO,
+    CompanyWithRecruitersDTO,
     CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     InviteTokenDTO,
@@ -60,7 +62,18 @@ def create_company(account_id: uuid.UUID, payload):
 
 def get_company(company_id: uuid.UUID):
     response = requests.get(f"http://company-api/company/get-company/{company_id}")
-    return propagate_response(response)
+    return propagate_response(response, CompanyDTO)
+
+
+def get_company_with_recruiters(company_id: uuid.UUID):
+    company_response = requests.get(f"http://company-api/company/get-company/{company_id}")
+    company = propagate_response(company_response, response_model=CompanyWithRecruitersDTO)
+
+    recruiters_response = requests.get(f"http://company-api/recruiter/get-recruiters-by-company/{company_id}")
+    recruiters = propagate_response(recruiters_response)
+
+    company.recruiters = recruiters
+    return company
 
 
 def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
