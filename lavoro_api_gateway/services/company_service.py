@@ -48,6 +48,11 @@ def create_company(account_id: uuid.UUID, payload):
     return propagate_response(response)
 
 
+def get_company_by_recruiter(recruiter_account_id: uuid.UUID):
+    response = requests.get(f"http://company-api/company/get-company-by-recruiter/{recruiter_account_id}")
+    return propagate_response(response)
+
+
 def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
     user = None
     try:

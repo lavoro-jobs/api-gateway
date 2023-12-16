@@ -37,6 +37,13 @@ def create_company(
     return company_service.create_company(current_user.id, payload)
 
 
+@router.get("/get-company-by-recruiter")
+def get_company_by_recruiter(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+):
+    return company_service.get_company_by_recruiter(recruiter_profile.account_id)
+
+
 @router.get("/get-recruiter-profile")
 def get_recruiter(current_user: Annotated[Account, Depends(get_current_recruiter_user)]):
     return company_service.get_recruiter_profile_with_company_name(current_user.id)
