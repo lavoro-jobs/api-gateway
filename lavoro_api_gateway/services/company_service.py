@@ -160,6 +160,13 @@ def update_job_post(job_post_id: uuid.UUID, payload: UpdateJobPostDTO):
     publish_item_to_match(message)
 
 
+def soft_delete_job_post(id: uuid.UUID, job_post_id: uuid.UUID):
+    response = requests.patch(f"http://company-api/job-post/soft-delete-job-post/{job_post_id}")
+    job_post = propagate_response(response, response_model=JobPost)
+    message = generate_job_post_to_match(job_post)
+    publish_item_to_match(message)
+
+
 def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
     response = requests.post(
         f"http://company-api/job-post/create-assignees/{job_post_id}",
