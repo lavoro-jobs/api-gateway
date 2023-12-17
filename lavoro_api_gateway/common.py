@@ -150,6 +150,7 @@ def generate_job_post_to_match(job_post: JobPost):
         salary_min=job_post.salary_min,
         salary_max=job_post.salary_max,
         seniority_level=job_post.seniority_level,
+        end_date=job_post.end_date,
     )
     return ItemToMatch(data=job_post_to_match)
 

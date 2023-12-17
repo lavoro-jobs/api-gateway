@@ -96,6 +96,14 @@ def update_applicant_profile(
     return company_service.update_job_post(job_post_id, payload)
 
 
+@router.patch("/soft-delete-job-post/{job_post_id}", status_code=status.HTTP_200_OK)
+def soft_delete_job_post(
+    job_post_id: uuid.UUID,
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+):
+    return company_service.soft_delete_job_post(job_post_id)
+
+
 @router.post("/assign-job-post/{job_post_id}")
 def assign_job_post(
     job_post_id: uuid.UUID,
