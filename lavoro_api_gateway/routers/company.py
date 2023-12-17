@@ -1,4 +1,5 @@
 from typing import Annotated
+import uuid
 
 from fastapi import APIRouter, Depends, status
 from pydantic import EmailStr
@@ -17,6 +18,7 @@ from lavoro_library.model.company_api.dtos import (
     CreateJobPostDTO,
     CreateRecruiterProfileDTO,
     CreateCompanyDTO,
+    UpdateJobPostDTO,
     UpdateRecruiterProfileDTO,
 )
 
@@ -83,6 +85,14 @@ def create_job_post(
     payload: CreateJobPostDTO,
 ):
     return company_service.create_job_post(recruiter_profile.company_id, recruiter_profile.account_id, payload)
+
+
+@router.patch("/update-job-post/{job_post_id}", status_code=status.HTTP_200_OK)
+def update_applicant_profile(
+    job_post_id: uuid.UUID,
+    payload: UpdateJobPostDTO,
+):
+    return company_service.update_job_post(job_post_id, payload)
 
 
 @router.get("/get-job-posts-by-company")
