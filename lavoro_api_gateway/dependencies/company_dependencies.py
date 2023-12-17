@@ -19,5 +19,7 @@ def get_admin_recruiter_profile(recruiter_profile: Annotated[RecruiterProfile, D
     return recruiter_profile
 
 
-def get_recruiter_job_posts(current_user: Annotated[Account, Depends(get_current_recruiter_user)]):
-    return common.get_recruiter_job_posts(current_user.id)
+def get_recruiter_job_posts(recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)]):
+    if recruiter_profile.recruiter_role != "admin":
+        return common.get_recruiter_job_posts(recruiter_profile.account_id)
+    return common.get_job_posts_by_company(recruiter_profile.company_id)

@@ -1,5 +1,6 @@
-from typing import List
 import uuid
+from typing import List
+
 import requests
 from pydantic import EmailStr
 
@@ -44,6 +45,26 @@ def get_recruiter_profile(account_id: uuid.UUID):
 
 def get_recruiter_job_posts(account_id: uuid.UUID):
     job_posts_response = requests.get(f"http://company-api/job-post/get-job-posts-by-recruiter/{account_id}")
+    job_posts = propagate_response(job_posts_response)
+    job_posts = [JobPost(**job_post) for job_post in job_posts]
+
+    hydrated_job_posts = []
+    for job_post in job_posts:
+        assignees_response = requests.get(f"http://company-api/job-post/get-assignees/{job_post.id}")
+        assignees = propagate_response(assignees_response)
+        assignees = [RecruiterProfile(**assignee) for assignee in assignees]
+
+        hydrated_job_post: JobPostDTO = fill_database_model_with_catalog_data(
+            JobPost(**job_post.model_dump()), JobPostDTO
+        )
+        hydrated_job_post.assignees = assignees
+        hydrated_job_posts.append(hydrated_job_post)
+
+    return hydrated_job_posts
+
+
+def get_job_posts_by_company(company_id: uuid.UUID):
+    job_posts_response = requests.get(f"http://company-api/job-post/get-job-posts-by-company/{company_id}")
     job_posts = propagate_response(job_posts_response)
     job_posts = [JobPost(**job_post) for job_post in job_posts]
 
