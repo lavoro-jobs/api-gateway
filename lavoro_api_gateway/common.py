@@ -5,6 +5,7 @@ from pydantic import EmailStr
 
 from fastapi import HTTPException
 
+from lavoro_api_gateway.amqp import producer
 from lavoro_api_gateway.database.queries import (
     get_position_catalog,
     get_skills_catalog,
@@ -13,8 +14,10 @@ from lavoro_api_gateway.database.queries import (
     get_work_type_catalog,
 )
 from lavoro_library.model.api_gateway.dtos import ContractTypeDTO, EducationLevelDTO, PositionDTO, SkillDTO, WorkTypeDTO
+from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
 from lavoro_library.model.auth_api.db_models import Account
-from lavoro_library.model.company_api.db_models import RecruiterProfile
+from lavoro_library.model.company_api.db_models import JobPost, RecruiterProfile
+from lavoro_library.model.message_schemas import ApplicantProfileToMatch, ItemToMatch, JobPostToMatch
 
 
 def propagate_response(response, response_model=None):
@@ -115,3 +118,41 @@ def fill_database_model_with_catalog_data(input_model, output_model_type):
     output_model = output_model_type(**output_dict)
 
     return output_model
+
+
+def generate_applicant_profile_to_match(applicant_profile: ApplicantProfile, experiences: List[Experience]):
+    experience_years = 0 if len(experiences) == 0 else sum([experience.years for experience in experiences])
+    applicant_profile_to_match = ApplicantProfileToMatch(
+        applicant_account_id=applicant_profile.account_id,
+        education_level_id=applicant_profile.education_level_id,
+        skill_ids=applicant_profile.skill_ids,
+        work_type_id=applicant_profile.work_type_id,
+        seniority_level=applicant_profile.seniority_level,
+        position_id=applicant_profile.position_id,
+        home_location=applicant_profile.home_location,
+        work_location_max_distance=applicant_profile.work_location_max_distance,
+        contract_type_id=applicant_profile.contract_type_id,
+        min_salary=applicant_profile.min_salary,
+        experience_years=experience_years,
+    )
+    return ItemToMatch(data=applicant_profile_to_match)
+
+
+def generate_job_post_to_match(job_post: JobPost):
+    job_post_to_match = JobPostToMatch(
+        job_post_id=job_post.id,
+        position_id=job_post.position_id,
+        education_level_id=job_post.education_level_id,
+        skill_ids=job_post.skill_ids,
+        work_type_id=job_post.work_type_id,
+        work_location=job_post.work_location,
+        contract_type_id=job_post.contract_type_id,
+        salary_min=job_post.salary_min,
+        salary_max=job_post.salary_max,
+        seniority_level=job_post.seniority_level,
+    )
+    return ItemToMatch(data=job_post_to_match)
+
+
+def publish_item_to_match(item_to_match: ItemToMatch):
+    producer.publish(item_to_match)

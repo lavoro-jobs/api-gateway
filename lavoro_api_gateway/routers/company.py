@@ -15,7 +15,8 @@ from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.api_gateway.dtos import JoinCompanyDTO
 from lavoro_library.model.company_api.db_models import RecruiterProfile, RecruiterRole
 from lavoro_library.model.company_api.dtos import (
-    CreateJobPostDTO,
+    CreateAssigneesDTO,
+    CreateJobPostWithAssigneesDTO,
     CreateRecruiterProfileDTO,
     CreateCompanyDTO,
     UpdateJobPostDTO,
@@ -82,7 +83,7 @@ def join_company(invite_token: str, payload: JoinCompanyDTO):
 @router.post("/create-job-post")
 def create_job_post(
     recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
-    payload: CreateJobPostDTO,
+    payload: CreateJobPostWithAssigneesDTO,
 ):
     return company_service.create_job_post(recruiter_profile.company_id, recruiter_profile.account_id, payload)
 
@@ -93,6 +94,15 @@ def update_applicant_profile(
     payload: UpdateJobPostDTO,
 ):
     return company_service.update_job_post(job_post_id, payload)
+
+
+@router.post("/assign-job-post/{job_post_id}")
+def assign_job_post(
+    job_post_id: uuid.UUID,
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
+    payload: CreateAssigneesDTO,
+):
+    return company_service.assign_job_post(job_post_id, payload)
 
 
 @router.get("/get-job-posts-by-company")
