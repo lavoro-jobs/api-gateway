@@ -17,3 +17,7 @@ def get_admin_recruiter_profile(recruiter_profile: Annotated[RecruiterProfile, D
     if recruiter_profile.recruiter_role != "admin":
         raise HTTPException(status_code=403, detail="User is not a company admin")
     return recruiter_profile
+
+
+def get_recruiter_job_posts(current_user: Annotated[Account, Depends(get_current_recruiter_user)]):
+    return common.get_recruiter_job_posts(current_user.id)

@@ -17,6 +17,7 @@ from lavoro_library.model.api_gateway.dtos import ContractTypeDTO, EducationLeve
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
 from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.company_api.db_models import JobPost, RecruiterProfile
+from lavoro_library.model.company_api.dtos import JobPostDTO
 from lavoro_library.model.message_schemas import ApplicantProfileToMatch, ItemToMatch, JobPostToMatch
 
 
@@ -39,6 +40,26 @@ def get_account(email: EmailStr):
 def get_recruiter_profile(account_id: uuid.UUID):
     response = requests.get(f"http://company-api/recruiter/get-recruiter-profile/{account_id}")
     return propagate_response(response, response_model=RecruiterProfile)
+
+
+def get_recruiter_job_posts(account_id: uuid.UUID):
+    job_posts_response = requests.get(f"http://company-api/job-post/get-job-posts-by-recruiter/{account_id}")
+    job_posts = propagate_response(job_posts_response)
+    job_posts = [JobPost(**job_post) for job_post in job_posts]
+
+    hydrated_job_posts = []
+    for job_post in job_posts:
+        assignees_response = requests.get(f"http://company-api/job-post/get-assignees/{job_post.id}")
+        assignees = propagate_response(assignees_response)
+        assignees = [RecruiterProfile(**assignee) for assignee in assignees]
+
+        hydrated_job_post: JobPostDTO = fill_database_model_with_catalog_data(
+            JobPost(**job_post.model_dump()), JobPostDTO
+        )
+        hydrated_job_post.assignees = assignees
+        hydrated_job_posts.append(hydrated_job_post)
+
+    return hydrated_job_posts
 
 
 def fill_database_model_with_catalog_data(input_model, output_model_type):
