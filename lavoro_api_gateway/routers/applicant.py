@@ -49,16 +49,16 @@ def update_applicant_profile(
 
 @router.patch("/update-applicant-experience/{experience_id}", status_code=status.HTTP_200_OK)
 def update_applicant_experience(
+    current_user: Annotated[Account, Depends(get_current_applicant_user)],
     experience_id: uuid.UUID,
     payload: UpdateApplicantExperienceDTO,
-    current_user: Annotated[Account, Depends(get_current_applicant_user)],
 ):
-    return applicant_service.update_applicant_experience(experience_id, payload)
+    return applicant_service.update_applicant_experience(current_user.id, experience_id, payload)
 
 
 @router.delete("/delete-applicant-experience/{experience_id}", status_code=status.HTTP_200_OK)
 def delete_applicant_experience(
-    experience_id: uuid.UUID,
     current_user: Annotated[Account, Depends(get_current_applicant_user)],
+    experience_id: uuid.UUID,
 ):
-    return applicant_service.delete_applicant_experience(experience_id)
+    return applicant_service.delete_applicant_experience(current_user.id, experience_id)
