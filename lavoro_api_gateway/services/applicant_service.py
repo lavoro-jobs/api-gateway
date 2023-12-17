@@ -1,11 +1,16 @@
-from typing import List
 import uuid
+from typing import List
+
 import requests
 
 from fastapi.encoders import jsonable_encoder
 
-from lavoro_api_gateway.common import fill_database_model_with_catalog_data
-from lavoro_api_gateway.common import propagate_response
+from lavoro_api_gateway.common import (
+    fill_database_model_with_catalog_data,
+    propagate_response,
+    generate_applicant_profile_to_match,
+    publish_item_to_match,
+)
 
 from lavoro_library.model.applicant_api.dtos import (
     ApplicantProfileDTO,
@@ -26,8 +31,9 @@ def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProf
         json=jsonable_encoder(create_applicant_profile_dto),
         headers={"Content-Type": "application/json"},
     )
-    propagate_response(applicant_profile_response)
+    applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
 
+    experiences = []
     if payload.experiences:
         create_experiences_dto = payload.experiences
         experiences_response = requests.post(
@@ -35,7 +41,11 @@ def create_applicant_profile(account_id: uuid.UUID, payload: CreateApplicantProf
             json=jsonable_encoder(create_experiences_dto),
             headers={"Content-Type": "application/json"},
         )
-        propagate_response(experiences_response)
+        experiences = propagate_response(experiences_response)
+        experiences = [Experience(**experience) for experience in experiences]
+
+    message = generate_applicant_profile_to_match(applicant_profile, experiences)
+    publish_item_to_match(message)
 
     return {"detail": "Applicant profile created"}
 
