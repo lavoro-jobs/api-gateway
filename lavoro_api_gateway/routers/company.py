@@ -101,7 +101,7 @@ def soft_delete_job_post(
     job_post_id: uuid.UUID,
     recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
 ):
-    return company_service.soft_delete_job_post(recruiter_profile.account_id, job_post_id)
+    return company_service.soft_delete_job_post(job_post_id)
 
 
 @router.post("/assign-job-post/{job_post_id}")
