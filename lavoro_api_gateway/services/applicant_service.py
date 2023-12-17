@@ -56,8 +56,14 @@ def create_experiences(account_id: uuid.UUID, payload: List[CreateExperienceDTO]
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
-    propagate_response(response)
-    return {"detail": "Applicant experiences created"}
+    experiences = propagate_response(response)
+    experiences = [Experience(**experience) for experience in experiences]
+    applicant_profile_response = requests.get(f"http://applicant-api/applicant/get-applicant-profile/{account_id}")
+    applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
+    
+    message = generate_applicant_profile_to_match(applicant_profile, experiences)
+    publish_item_to_match(message)
+    return {"detail": "Experiences created"}
 
 
 def get_applicant_profile(account_id: uuid.UUID):
@@ -86,20 +92,39 @@ def update_applicant_profile(account_id: uuid.UUID, payload: UpdateApplicantProf
         json=jsonable_encoder(payload),
         headers={"Content-Type": "application/json"},
     )
-    return propagate_response(response)
+
+    applicant_profile = propagate_response(response, response_model=ApplicantProfile)
+    experiences_response = requests.get(f"http://applicant-api/applicant/get-experiences/{account_id}")
+    experiences = propagate_response(experiences_response)
+    experiences = [Experience(**experience) for experience in experiences]
+
+    message = generate_applicant_profile_to_match(applicant_profile, experiences)
+    publish_item_to_match(message)
 
 
-def update_applicant_experience(experience_id: uuid.UUID, payload: UpdateApplicantExperienceDTO):
+def update_applicant_experience(account_id: uuid.UUID, experience_id: uuid.UUID, payload: UpdateApplicantExperienceDTO):
     response = requests.patch(
         f"http://applicant-api/applicant/update-applicant-experience/{experience_id}", json=jsonable_encoder(payload)
     )
-    if response.status_code >= 400:
-        propagate_response(response)
-    return response.json()
+    
+    experiences_response = requests.get(f"http://applicant-api/applicant/get-experiences/{account_id}")
+    experiences = propagate_response(experiences_response)
+    experiences = [Experience(**experience) for experience in experiences]
+    applicant_profile_response = requests.get(f"http://applicant-api/applicant/get-applicant-profile/{account_id}")
+    applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
+    
+    message = generate_applicant_profile_to_match(applicant_profile, experiences)
+    publish_item_to_match(message)
 
 
-def delete_applicant_experience(experience_id: uuid.UUID):
+def delete_applicant_experience(account_id: uuid.UUID, experience_id: uuid.UUID):
     response = requests.delete(f"http://applicant-api/applicant/delete-applicant-experience/{experience_id}")
-    if response.status_code >= 400:
-        propagate_response(response)
-    return response.json()
+    
+    experiences_response = requests.get(f"http://applicant-api/applicant/get-experiences/{account_id}")
+    experiences = propagate_response(experiences_response)
+    experiences = [Experience(**experience) for experience in experiences]
+    applicant_profile_response = requests.get(f"http://applicant-api/applicant/get-applicant-profile/{account_id}")
+    applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
+    
+    message = generate_applicant_profile_to_match(applicant_profile, experiences)
+    publish_item_to_match(message)
