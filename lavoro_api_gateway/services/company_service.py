@@ -1,3 +1,4 @@
+from typing import List
 import uuid
 from fastapi import HTTPException
 from pydantic import EmailStr
@@ -26,6 +27,7 @@ from lavoro_library.model.company_api.dtos import (
     JobPostDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
+    UpdateJobPostDTO,
     UpdateRecruiterProfileDTO,
 )
 
@@ -86,7 +88,7 @@ def get_company_with_recruiters(company_id: uuid.UUID):
 def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
     user = None
     try:
-        user = get_account(company_id)
+        user = get_account(new_recruiter_email)
     except HTTPException as e:
         pass
 
@@ -145,6 +147,15 @@ def create_job_post(company_id: uuid.UUID, recruiter_account_id: uuid.UUID, payl
 
     message = generate_job_post_to_match(job_post)
     publish_item_to_match(message)
+
+
+def update_job_post(job_post_id: uuid.UUID, payload: UpdateJobPostDTO):
+    response = requests.patch(
+        f"http://company-api/job-post/update-job-post/{job_post_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
 
 
 def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
