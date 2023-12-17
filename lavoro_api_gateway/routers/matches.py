@@ -20,3 +20,8 @@ def get_matches_by_job_post(
     job_post_id: uuid.UUID, current_user: Annotated[Account, Depends(get_current_recruiter_user)]
 ):
     return matches_service.get_matches_by_job_post(job_post_id)
+
+
+@router.post("/reject-match/{job_post_id}")
+def reject_match(job_post_id: uuid.UUID, current_user: Annotated[Account, Depends(get_current_applicant_user)]):
+    return matches_service.reject_match(job_post_id, current_user.id)
