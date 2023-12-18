@@ -134,3 +134,8 @@ def get_job_posts_by_recruiter(
     recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
 ):
     return company_service.get_job_posts_by_recruiter(recruiter_profile.account_id)
+
+
+@router.get("/get-random-job-posts/{count}")
+def get_random_job_posts(count: int):
+    return company_service.get_random_job_posts(count)
