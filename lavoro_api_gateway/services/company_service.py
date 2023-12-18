@@ -27,6 +27,7 @@ from lavoro_library.model.company_api.dtos import (
     JobPostDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
+    UpdateCompanyDTO,
     UpdateJobPostDTO,
     UpdateRecruiterProfileDTO,
 )
@@ -83,6 +84,15 @@ def get_company_with_recruiters(company_id: uuid.UUID):
 
     company.recruiters = recruiters
     return company
+
+
+def update_company(company_id: uuid.UUID, payload: UpdateCompanyDTO):
+    response = requests.patch(
+        f"http://company-api/company/update-company/{company_id}",
+        json=jsonable_encoder(payload),
+        headers={"Content-Type": "application/json"},
+    )
+    return propagate_response(response)
 
 
 def invite_recruiter(company_id: uuid.UUID, new_recruiter_email: EmailStr):
