@@ -25,6 +25,7 @@ from lavoro_library.model.company_api.dtos import (
     CreateRecruiterProfileDTO,
     InviteTokenDTO,
     JobPostDTO,
+    JobPostForApplicantDTO,
     RecruiterProfileDTO,
     RecruiterProfileWithCompanyNameDTO,
     UpdateCompanyDTO,
@@ -222,5 +223,25 @@ def get_job_posts_by_recruiter(recruiter_account_id: uuid.UUID):
         )
         hydrated_job_post.assignees = assignees
         hydrated_job_posts.append(hydrated_job_post)
+
+    return hydrated_job_posts
+
+
+def get_random_job_posts(count: int):
+    response = requests.get(f"http://company-api/job-post/get-random-job-posts/{count}")
+    job_posts = propagate_response(response)
+    job_posts = [JobPost(**job_post) for job_post in job_posts]
+
+    hydrated_job_posts = []
+    for job_post in job_posts:
+        company_response = requests.get(f"http://company-api/company/get-company/{job_post.company_id}")
+        company = propagate_response(company_response, response_model=CompanyDTO)
+
+        job_post: JobPostDTO = fill_database_model_with_catalog_data(job_post, JobPostDTO)
+        job_post_for_applicant = JobPostForApplicantDTO(
+            **job_post.model_dump(),
+            company=company,
+        )
+        hydrated_job_posts.append(job_post_for_applicant)
 
     return hydrated_job_posts
