@@ -215,7 +215,7 @@ def get_random_job_posts(count: int):
         company_response = requests.get(f"http://company-api/company/get-company/{job_post.company_id}")
         company = propagate_response(company_response, response_model=CompanyDTO)
 
-        job_post: JobPostDTO = fill_database_model_with_catalog_data(job_post, JobPostDTO)
+        job_post: JobPostDTO = common.fill_database_model_with_catalog_data(job_post, JobPostDTO)
         job_post_for_applicant = JobPostForApplicantDTO(
             **job_post.model_dump(),
             company=company,
