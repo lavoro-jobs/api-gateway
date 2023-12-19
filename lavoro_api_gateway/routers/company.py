@@ -23,6 +23,7 @@ from lavoro_library.model.company_api.dtos import (
     CreateJobPostWithAssigneesDTO,
     CreateRecruiterProfileDTO,
     CreateCompanyDTO,
+    UpdateCompanyDTO,
     UpdateJobPostDTO,
     UpdateRecruiterProfileDTO,
 )
@@ -65,6 +66,14 @@ def get_company_with_recruiters(
     recruiter_profile: Annotated[RecruiterProfile, Depends(get_recruiter_profile)],
 ):
     return company_service.get_company_with_recruiters(recruiter_profile.company_id)
+
+
+@router.patch("/update-company")
+def update_company(
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_admin_recruiter_profile)],
+    payload: UpdateCompanyDTO,
+):
+    return company_service.update_company(recruiter_profile.company_id, payload)
 
 
 @router.get("/get-recruiter-profile")
@@ -136,3 +145,8 @@ def get_job_posts_by_recruiter(
     job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
 ):
     return job_posts
+
+
+@router.get("/get-random-job-posts/{count}")
+def get_random_job_posts(count: int):
+    return company_service.get_random_job_posts(count)
