@@ -142,7 +142,6 @@ def create_job_post(company_id: uuid.UUID, recruiter_account_id: uuid.UUID, payl
     job_post = propagate_response(job_post_response, response_model=JobPost)
 
     assignees_request = payload.assignees
-    assignees_request.append(recruiter_account_id)
     assignees_response = requests.post(
         f"http://company-api/job-post/create-assignees/{job_post.id}",
         json=jsonable_encoder(assignees_request),
