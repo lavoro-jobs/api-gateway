@@ -181,6 +181,11 @@ def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
     return propagate_response(response)
 
 
+def unassign_job_post(job_post_id: uuid.UUID, recruiter_account_id: uuid.UUID):
+    response = requests.delete(f"http://company-api/job-post/unassign-job-post/{job_post_id}/{recruiter_account_id}")
+    return propagate_response(response)
+
+
 def get_job_posts_by_company(company_id: uuid.UUID):
     return common.get_job_posts_by_company(company_id)
 
