@@ -60,3 +60,15 @@ def get_matches_by_job_post(job_post_id: uuid.UUID):
 def reject_match(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
     response = requests.post(f"http://matching-api/matches/reject-match/{job_post_id}/{applicant_account_id}")
     return propagate_response(response)
+
+
+def get_applications_to_job_post(job_post_id: uuid.UUID):
+    response = requests.get(f"http://matching-api/application/get-applications-to-job-post/{job_post_id}")
+    return propagate_response(response)
+
+
+def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
+    response = requests.post(
+        f"http://matching-api/application/approve-application/{job_post_id}/{applicant_account_id}"
+    )
+    return propagate_response(response)
