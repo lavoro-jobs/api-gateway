@@ -177,6 +177,9 @@ def delete_job_post(job_post_id: uuid.UUID):
     deleted_job_post = propagate_response(response, response_model=JobPost)
     if not deleted_job_post:
         raise HTTPException(status_code=400, detail="Job post not found")
+    response = requests.delete(f"http://matching-api/matches/delete-matches/{job_post_id}")
+    propagate_response(response)
+
     message = common.generate_delete_job_post(job_post_id)
     common.publish_item_to_match(message)
 
