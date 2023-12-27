@@ -172,6 +172,15 @@ def soft_delete_job_post(job_post_id: uuid.UUID):
     common.publish_item_to_match(message)
 
 
+def delete_job_post(job_post_id: uuid.UUID):
+    response = requests.delete(f"http://company-api/job-post/delete-job-post/{job_post_id}")
+    deleted_job_post = propagate_response(response, response_model=JobPost)
+    if not deleted_job_post:
+        raise HTTPException(status_code=400, detail="Job post not found")
+    message = common.generate_delete_job_post(job_post_id)
+    common.publish_item_to_match(message)
+
+
 def assign_job_post(job_post_id: uuid.UUID, payload: CreateAssigneesDTO):
     response = requests.post(
         f"http://company-api/job-post/create-assignees/{job_post_id}",

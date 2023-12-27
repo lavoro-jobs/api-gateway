@@ -19,7 +19,7 @@ from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Exper
 from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.company_api.db_models import JobPost, RecruiterProfile
 from lavoro_library.model.company_api.dtos import JobPostDTO
-from lavoro_library.model.message_schemas import ApplicantProfileToMatch, ItemToMatch, JobPostToMatch
+from lavoro_library.model.message_schemas import ApplicantProfileToMatch, DeleteJobPost, ItemToMatch, JobPostToMatch
 
 
 def propagate_response(response, response_model=None):
@@ -195,6 +195,11 @@ def generate_job_post_to_match(job_post: JobPost):
         end_date=job_post.end_date,
     )
     return ItemToMatch(data=job_post_to_match)
+
+
+def generate_delete_job_post(job_post_id: uuid.UUID):
+    delete_job_post = DeleteJobPost(job_post_id=job_post_id)
+    return ItemToMatch(data=delete_job_post)
 
 
 def publish_item_to_match(item_to_match: ItemToMatch):
