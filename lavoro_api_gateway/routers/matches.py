@@ -30,3 +30,8 @@ def get_matches_by_job_post(
 @router.post("/reject-match/{job_post_id}")
 def reject_match(job_post_id: uuid.UUID, current_user: Annotated[Account, Depends(get_current_applicant_user)]):
     return matches_service.reject_match(job_post_id, current_user.id)
+
+
+@router.post("/create-application/{job_post_id}")
+def create_application(job_post_id: uuid.UUID, current_user: Annotated[Account, Depends(get_current_applicant_user)]):
+    return matches_service.create_application(job_post_id, current_user.id)
