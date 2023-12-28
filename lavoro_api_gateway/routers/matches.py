@@ -52,3 +52,8 @@ def approve_application(
     if job_post_id not in job_posts_ids:
         raise HTTPException(status_code=404, detail="Recruiter is not assigned to this job post")
     return matches_service.approve_application(job_post_id, applicant_account_id)
+
+
+@router.post("/create-application/{job_post_id}")
+def create_application(job_post_id: uuid.UUID, current_user: Annotated[Account, Depends(get_current_applicant_user)]):
+    return matches_service.create_application(job_post_id, current_user.id)

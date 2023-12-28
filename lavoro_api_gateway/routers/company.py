@@ -121,6 +121,18 @@ def soft_delete_job_post(job_post_id: uuid.UUID, job_posts: Annotated[List[JobPo
     return company_service.soft_delete_job_post(job_post_id)
 
 
+@router.delete("/delete-job-post/{job_post_id}", status_code=status.HTTP_200_OK)
+def delete_job_post(
+    job_post_id: uuid.UUID,
+    recruiter_profile: Annotated[RecruiterProfile, Depends(get_admin_recruiter_profile)],
+    job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
+):
+    job_post_ids = [job_post.id for job_post in job_posts]
+    if job_post_id not in job_post_ids:
+        raise HTTPException(status_code=400, detail="Recruiter is not assigned to this job post")
+    return company_service.delete_job_post(job_post_id)
+
+
 @router.post("/assign-job-post/{job_post_id}")
 def assign_job_post(
     job_post_id: uuid.UUID,
@@ -131,6 +143,18 @@ def assign_job_post(
     if job_post_id not in job_post_ids:
         raise HTTPException(status_code=400, detail="Recruiter is not assigned to this job post")
     return company_service.assign_job_post(job_post_id, payload)
+
+
+@router.delete("/unassign-job-post/{job_post_id}/{recruiter_id}")
+def unassign_job_post(
+    job_post_id: uuid.UUID,
+    job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
+    recruiter_id: uuid.UUID,
+):
+    job_post_ids = [job_post.id for job_post in job_posts]
+    if job_post_id not in job_post_ids:
+        raise HTTPException(status_code=400, detail="Recruiter is not assigned to this job post")
+    return company_service.unassign_job_post(job_post_id, recruiter_id)
 
 
 @router.get("/get-job-posts-by-company")
