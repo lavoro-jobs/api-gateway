@@ -1,3 +1,4 @@
+from typing import List
 import uuid
 from fastapi.encoders import jsonable_encoder
 import requests
@@ -8,7 +9,13 @@ from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, Applica
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO
 from lavoro_library.model.matching_api.db_models import Match
-from lavoro_library.model.matching_api.dtos import ApplicantMatchDTO, ApplicationDTO, CreateCommentDTO, JobPostMatchDTO
+from lavoro_library.model.matching_api.dtos import (
+    ApplicantMatchDTO,
+    ApplicationDTO,
+    CommentDTO,
+    CreateCommentDTO,
+    JobPostMatchDTO,
+)
 
 
 def get_matches_by_applicant(applicant_account_id: uuid.UUID):
@@ -71,6 +78,15 @@ def get_applications_to_job_post(job_post_id: uuid.UUID):
     response = requests.get(f"http://matching-api/application/get-applications-to-job-post/{job_post_id}")
     applications = propagate_response(response)
     applications_dtos = [ApplicationDTO(**application) for application in applications]
+
+    for application in applications_dtos:
+        comments_response = requests.get(
+            f"http://matching-api/application/get-comments-on-application/{job_post_id}/{application.applicant_account_id}"
+        )
+        comments = propagate_response(comments_response)
+        comments = [CommentDTO(**comment) for comment in comments]
+        application.comments = comments
+
     return applications_dtos
 
 
@@ -103,3 +119,12 @@ def comment_application(
         json=jsonable_encoder(payload),
     )
     return propagate_response(response)
+
+
+def get_comments_on_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
+    response = requests.get(
+        f"http://matching-api/application/get-comments-on-application/{job_post_id}/{applicant_account_id}"
+    )
+    comments = propagate_response(response)
+    comments = [CommentDTO(**comment) for comment in comments]
+    return comments

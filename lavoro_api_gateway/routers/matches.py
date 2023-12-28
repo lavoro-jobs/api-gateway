@@ -75,5 +75,18 @@ def comment_application(
 ):
     job_posts_ids = [job_post.id for job_post in job_posts]
     if job_post_id not in job_posts_ids:
-        raise HTTPException(status_code=404, detail="Recruiter is not assigned to this job post")
+        raise HTTPException(status_code=404, detail="Recruiter is not assigned to the job post of this application")
     return matches_service.comment_application(job_post_id, applicant_account_id, current_recruiter.id, payload)
+
+
+@router.get("/get-comments-on-application/{job_post_id}/{applicant_account_id}")
+def get_comments_on_application(
+    job_post_id: uuid.UUID,
+    applicant_account_id: uuid.UUID,
+    current_recruiter: Annotated[Account, Depends(get_current_recruiter_user)],
+    job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
+):
+    job_posts_ids = [job_post.id for job_post in job_posts]
+    if job_post_id not in job_posts_ids:
+        raise HTTPException(status_code=404, detail="Recruiter is not assigned to the job post of this application")
+    return matches_service.get_comments_on_application(job_post_id, applicant_account_id)
