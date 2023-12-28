@@ -1,4 +1,5 @@
 import uuid
+from fastapi.encoders import jsonable_encoder
 import requests
 
 from lavoro_api_gateway.common import fill_database_model_with_catalog_data, propagate_response
@@ -7,7 +8,7 @@ from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, Applica
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO
 from lavoro_library.model.matching_api.db_models import Match
-from lavoro_library.model.matching_api.dtos import ApplicantMatchDTO, JobPostMatchDTO
+from lavoro_library.model.matching_api.dtos import ApplicantMatchDTO, CreateCommentDTO, JobPostMatchDTO
 
 
 def get_matches_by_applicant(applicant_account_id: uuid.UUID):
@@ -64,4 +65,14 @@ def reject_match(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
 
 def create_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
     response = requests.post(f"http://matching-api/application/create-application/{job_post_id}/{applicant_account_id}")
+    return propagate_response(response)
+
+
+def comment_application(
+    job_post_id: uuid.UUID, applicant_account_id: uuid.UUID, current_recruiter_id: uuid.UUID, payload: CreateCommentDTO
+):
+    response = requests.post(
+        f"http://matching-api/application/comment-application/{current_recruiter_id}/{job_post_id}/{applicant_account_id}",
+        json=jsonable_encoder(payload),
+    )
     return propagate_response(response)
