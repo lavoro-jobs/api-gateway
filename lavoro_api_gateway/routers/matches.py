@@ -42,6 +42,11 @@ def get_applications_to_job_post(
     return matches_service.get_applications_to_job_post(job_post_id)
 
 
+@router.get("/get-created-applications-by-applicant")
+def get_created_applications_by_applicant(current_user: Annotated[Account, Depends(get_current_applicant_user)]):
+    return matches_service.get_created_applications_by_applicant(current_user.id)
+
+
 @router.post("/approve-application/{job_post_id}/{applicant_account_id}")
 def approve_application(
     job_post_id: uuid.UUID,

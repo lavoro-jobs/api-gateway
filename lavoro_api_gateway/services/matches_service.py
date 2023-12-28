@@ -7,7 +7,7 @@ from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, Applica
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO
 from lavoro_library.model.matching_api.db_models import Match
-from lavoro_library.model.matching_api.dtos import ApplicantMatchDTO, JobPostMatchDTO
+from lavoro_library.model.matching_api.dtos import ApplicantMatchDTO, ApplicationDTO, JobPostMatchDTO
 
 
 def get_matches_by_applicant(applicant_account_id: uuid.UUID):
@@ -64,7 +64,18 @@ def reject_match(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
 
 def get_applications_to_job_post(job_post_id: uuid.UUID):
     response = requests.get(f"http://matching-api/application/get-applications-to-job-post/{job_post_id}")
-    return propagate_response(response)
+    applications = propagate_response(response)
+    applications_dtos = [ApplicationDTO(**application) for application in applications]
+    return applications_dtos
+
+
+def get_created_applications_by_applicant(applicant_account_id: uuid.UUID):
+    response = requests.get(
+        f"http://matching-api/application/get-created-applications-by-applicant/{applicant_account_id}"
+    )
+    applications = propagate_response(response)
+    applications_dtos = [ApplicationDTO(**application) for application in applications]
+    return applications_dtos
 
 
 def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
