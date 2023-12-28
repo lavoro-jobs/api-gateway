@@ -128,3 +128,8 @@ def get_comments_on_application(job_post_id: uuid.UUID, applicant_account_id: uu
     comments = propagate_response(response)
     comments = [CommentDTO(**comment) for comment in comments]
     return comments
+
+
+def delete_comment(job_post_id: uuid.UUID, comment_id: uuid.UUID):
+    response = requests.delete(f"http://matching-api/application/delete-comment/{job_post_id}/{comment_id}")
+    return propagate_response(response)
