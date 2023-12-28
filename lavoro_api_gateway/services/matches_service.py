@@ -32,6 +32,8 @@ def get_matches_by_applicant(applicant_account_id: uuid.UUID):
             job_post=job_post_for_applicant,
             match_score=match.match_score,
             approved_by_applicant=match.approved_by_applicant,
+            created_on_date=match.created_on_date,
+            end_date=match.end_date,
         )
         yield applicant_match
 
@@ -53,6 +55,8 @@ def get_matches_by_job_post(job_post_id: uuid.UUID):
             applicant_profile=applicant_profile_for_job_post,
             match_score=match.match_score,
             approved_by_applicant=match.approved_by_applicant,
+            created_on_date=match.created_on_date,
+            end_date=match.end_date,
         )
         yield applicant_match
 
