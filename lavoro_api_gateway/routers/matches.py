@@ -90,3 +90,16 @@ def get_comments_on_application(
     if job_post_id not in job_posts_ids:
         raise HTTPException(status_code=404, detail="Recruiter is not assigned to the job post of this application")
     return matches_service.get_comments_on_application(job_post_id, applicant_account_id)
+
+
+@router.delete("/delete-comment/{job_post_id}/{comment_id}")
+def delete_comment(
+    job_post_id: uuid.UUID,
+    comment_id: uuid.UUID,
+    current_recruiter: Annotated[Account, Depends(get_current_recruiter_user)],
+    job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
+):
+    job_posts_ids = [job_post.id for job_post in job_posts]
+    if job_post_id not in job_posts_ids:
+        raise HTTPException(status_code=404, detail="Recruiter is not assigned to the job post of this application")
+    return matches_service.delete_comment(job_post_id, comment_id)
