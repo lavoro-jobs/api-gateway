@@ -8,7 +8,7 @@ from lavoro_api_gateway.services import auth_service
 
 
 from lavoro_library.model.auth_api.db_models import Account
-from lavoro_library.model.auth_api.dtos import AccountDTO, LoginDTO, RegisterDTO, TokenDTO
+from lavoro_library.model.auth_api.dtos import AccountWithStreamChatTokenDTO, LoginDTO, RegisterDTO, TokenDTO
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -22,8 +22,8 @@ def login(response: Response, form_data: Annotated[LoginDTO, Depends()]):
     return token_data
 
 
-@router.get("/account/current", response_model=AccountDTO)
-def get_current_account(current_user: Annotated[AccountDTO, Depends(get_current_active_user)]):
+@router.get("/account/current", response_model=AccountWithStreamChatTokenDTO)
+def get_current_account(current_user: Annotated[Account, Depends(get_current_active_user)]):
     return current_user
 
 
