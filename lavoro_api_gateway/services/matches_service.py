@@ -4,8 +4,8 @@ from fastapi.encoders import jsonable_encoder
 import requests
 
 from lavoro_api_gateway.common import fill_database_model_with_catalog_data, propagate_response
-from lavoro_library.model.applicant_api.db_models import ApplicantProfile
-from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, ApplicantProfileForJobPostDTO
+from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
+from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, ApplicantProfileForJobPostDTO, ExperienceDTO
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO
 from lavoro_library.model.matching_api.db_models import Match
@@ -74,8 +74,8 @@ def reject_match(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
     return propagate_response(response)
 
 
-def get_applications_to_job_post(job_post_id: uuid.UUID):
-    response = requests.get(f"http://matching-api/application/get-applications-to-job-post/{job_post_id}")
+def get_applications_by_job_post(job_post_id: uuid.UUID):
+    response = requests.get(f"http://matching-api/application/get-applications-by-job-post/{job_post_id}")
     applications = propagate_response(response)
     applications_dtos = [ApplicationDTO(**application) for application in applications]
 
@@ -86,6 +86,27 @@ def get_applications_to_job_post(job_post_id: uuid.UUID):
         comments = propagate_response(comments_response)
         comments = [CommentDTO(**comment) for comment in comments]
         application.comments = comments
+
+        applicant_profile_response = requests.get(
+            f"http://applicant-api/applicant/get-applicant-profile/{application.applicant_account_id}"
+        )
+        applicant_profile = propagate_response(applicant_profile_response, response_model=ApplicantProfile)
+
+        experiences_response = requests.get(
+            f"http://applicant-api/applicant/get-experiences/{application.applicant_account_id}"
+        )
+        experiences = propagate_response(experiences_response)
+
+        hydrated_applicant_profile: ApplicantProfileDTO = fill_database_model_with_catalog_data(
+            applicant_profile, ApplicantProfileDTO
+        )
+        hydrated_experiences: List[ExperienceDTO] = []
+        for experience in experiences:
+            hydrated_experience = fill_database_model_with_catalog_data(Experience(**experience), ExperienceDTO)
+            hydrated_experiences.append(hydrated_experience)
+
+        hydrated_applicant_profile.experiences = hydrated_experiences
+        application.applicant = hydrated_applicant_profile
 
     return applications_dtos
 
@@ -107,7 +128,9 @@ def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID)
 
 
 def reject_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
-    response = requests.patch(f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}")
+    response = requests.patch(
+        f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}"
+    )
     return propagate_response(response)
 
 
