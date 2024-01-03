@@ -48,7 +48,7 @@ def get_created_applications_by_applicant(current_user: Annotated[Account, Depen
     return matches_service.get_created_applications_by_applicant(current_user.id)
 
 
-@router.post("/approve-application/{job_post_id}/{applicant_account_id}")
+@router.patch("/approve-application/{job_post_id}/{applicant_account_id}")
 def approve_application(
     job_post_id: uuid.UUID,
     applicant_account_id: uuid.UUID,
@@ -58,6 +58,18 @@ def approve_application(
     if job_post_id not in job_posts_ids:
         raise HTTPException(status_code=404, detail="Recruiter is not assigned to this job post")
     return matches_service.approve_application(job_post_id, applicant_account_id)
+
+
+@router.patch("/reject-application/{job_post_id}/{applicant_account_id}")
+def reject_application(
+    job_post_id: uuid.UUID,
+    applicant_account_id: uuid.UUID,
+    job_posts: Annotated[List[JobPost], Depends(get_recruiter_job_posts)],
+):
+    job_posts_ids = [job_post.id for job_post in job_posts]
+    if job_post_id not in job_posts_ids:
+        raise HTTPException(status_code=404, detail="Recruiter is not assigned to this job post")
+    return matches_service.reject_application(job_post_id, applicant_account_id)
 
 
 @router.post("/create-application/{job_post_id}")
