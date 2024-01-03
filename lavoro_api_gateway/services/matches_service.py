@@ -100,14 +100,14 @@ def get_created_applications_by_applicant(applicant_account_id: uuid.UUID):
 
 
 def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
-    response = requests.post(
+    response = requests.patch(
         f"http://matching-api/application/approve-application/{job_post_id}/{applicant_account_id}"
     )
     return propagate_response(response)
 
 
 def reject_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
-    response = requests.post(f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}")
+    response = requests.patch(f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}")
     return propagate_response(response)
 
 
