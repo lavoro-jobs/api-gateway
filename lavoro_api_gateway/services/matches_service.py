@@ -106,6 +106,11 @@ def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID)
     return propagate_response(response)
 
 
+def reject_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
+    response = requests.post(f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}")
+    return propagate_response(response)
+
+
 def create_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
     response = requests.post(f"http://matching-api/application/create-application/{job_post_id}/{applicant_account_id}")
     return propagate_response(response)
