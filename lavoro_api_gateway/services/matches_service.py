@@ -90,8 +90,7 @@ def get_applications_to_job_post(job_post_id: uuid.UUID):
                 f"http://company-api/recruiter/get-recruiter-profile/{comment.account_id}"
             )
             recruiter_profile = propagate_response(recruiter_profile_response, response_model=RecruiterProfileDTO)
-            comment.recruiter_first_name = recruiter_profile.first_name
-            comment.recruiter_last_name = recruiter_profile.last_name
+            comment.recruiter = recruiter_profile
 
         application.comments = comments
 
@@ -148,8 +147,7 @@ def get_comments_on_application(job_post_id: uuid.UUID, applicant_account_id: uu
             f"http://company-api/recruiter/get-recruiter-profile/{comment.account_id}"
         )
         recruiter_profile = propagate_response(recruiter_profile_response, response_model=RecruiterProfileDTO)
-        comment.recruiter_first_name = recruiter_profile.first_name
-        comment.recruiter_last_name = recruiter_profile.last_name
+        comment.recruiter = recruiter_profile
 
     return comments
 
