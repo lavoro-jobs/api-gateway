@@ -7,7 +7,7 @@ from lavoro_api_gateway.common import fill_database_model_with_catalog_data, pro
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile
 from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, ApplicantProfileForJobPostDTO
 from lavoro_library.model.company_api.db_models import JobPost
-from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO
+from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO, RecruiterProfileDTO
 from lavoro_library.model.matching_api.db_models import Match
 from lavoro_library.model.matching_api.dtos import (
     ApplicantMatchDTO,
@@ -85,6 +85,14 @@ def get_applications_to_job_post(job_post_id: uuid.UUID):
         )
         comments = propagate_response(comments_response)
         comments = [CommentDTO(**comment) for comment in comments]
+        for comment in comments:
+            recruiter_profile_response = requests.get(
+                f"http://company-api/recruiter/get-recruiter-profile/{comment.account_id}"
+            )
+            recruiter_profile = propagate_response(recruiter_profile_response, response_model=RecruiterProfileDTO)
+            comment.recruiter_first_name = recruiter_profile.first_name
+            comment.recruiter_last_name = recruiter_profile.last_name
+
         application.comments = comments
 
     return applications_dtos
@@ -107,7 +115,9 @@ def approve_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID)
 
 
 def reject_application(job_post_id: uuid.UUID, applicant_account_id: uuid.UUID):
-    response = requests.patch(f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}")
+    response = requests.patch(
+        f"http://matching-api/application/reject-application/{job_post_id}/{applicant_account_id}"
+    )
     return propagate_response(response)
 
 
@@ -132,6 +142,15 @@ def get_comments_on_application(job_post_id: uuid.UUID, applicant_account_id: uu
     )
     comments = propagate_response(response)
     comments = [CommentDTO(**comment) for comment in comments]
+
+    for comment in comments:
+        recruiter_profile_response = requests.get(
+            f"http://company-api/recruiter/get-recruiter-profile/{comment.account_id}"
+        )
+        recruiter_profile = propagate_response(recruiter_profile_response, response_model=RecruiterProfileDTO)
+        comment.recruiter_first_name = recruiter_profile.first_name
+        comment.recruiter_last_name = recruiter_profile.last_name
+
     return comments
 
 
