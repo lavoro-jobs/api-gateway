@@ -24,3 +24,5 @@ spec:
                         value: "amqp://guest:guest@rabbitmq:5672"
                       - name: SECRET_KEY
                         value: "a43de72d46a42b9fb4a25c65b9d37db55221a2546d62ee579c73f52c62c4c060"
+                      - name: DB_CONNECTION_STRING
+                        value: "host=lavoro-pgsql.postgres.database.azure.com port=5432 dbname=config user=postgres password=PgSql123"
