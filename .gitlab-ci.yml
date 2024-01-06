@@ -16,7 +16,8 @@ build_api_gateway:
     before_script:
         - echo "Building Docker image..."
         - docker login $ACR_SERVER -u $APP_ID -p $SP_PASSWORD
-        - docker buildx create --use
+        - docker buildx create --name builder
+        - docker buildx use builder
     script:
         - docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA --target production . --push
     only:
