@@ -1,0 +1,35 @@
+stages:
+    - build
+    - deploy
+
+variables:
+    ACR_SERVER: "lavorocontainers.azurecr.io"
+    IMAGE_NAME: "$ACR_SERVER/api-gateway"
+    AKS_RESOURCE_GROUP: "lavoro"
+    AKS_CLUSTER_NAME: "lavoro-k8s"
+
+build_api_gateway:
+    stage: build
+    image: docker:19.03.12
+    services:
+        - docker:19.03.12-dind
+    script:
+        - echo "Building Docker image..."
+        - docker login $ACR_SERVER -u $APP_ID -p $SP_PASSWORD
+        - docker build -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+        - docker push $IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+    only:
+        - master
+
+deploy_to_aks:
+    stage: deploy
+    image: microsoft/azure-cli
+    script:
+        - echo "Deploying to AKS..."
+        - az login --service-principal -u $APP_ID -p $SP_PASSWORD # --tenant $TENANT_ID
+        - az aks get-credentials --resource-group $AKS_RESOURCE_GROUP --name $AKS_CLUSTER_NAME --overwrite-existing
+        - 'sed -i "s|image: .*|image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA|" deployment/deployment.yaml'
+        - kubectl apply -f deployment/deployment.yaml
+        - kubectl apply -f deployment/service.yaml
+    only:
+        - master
