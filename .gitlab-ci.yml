@@ -3,10 +3,10 @@ stages:
   - deploy
 
 variables:
-  ACR_SERVER: "<your-acr-server-name>.azurecr.io"
-  IMAGE_NAME: "$ACR_SERVER/yourproject/api-gateway"
-  AKS_RESOURCE_GROUP: "<your-aks-resource-group>"
-  AKS_CLUSTER_NAME: "<your-aks-cluster-name>"
+  ACR_SERVER: "lavorocontainers.azurecr.io"
+  IMAGE_NAME: "$ACR_SERVER/api-gateway"
+  AKS_RESOURCE_GROUP: "lavoro"
+  AKS_CLUSTER_NAME: "lavoro-k8s"
 
 build_api_gateway:
   stage: build
@@ -26,7 +26,7 @@ deploy_to_aks:
   image: microsoft/azure-cli
   script:
     - echo "Deploying to AKS..."
-    - az login --service-principal -u $APP_ID -p $SP_PASSWORD --tenant $TENANT_ID
+    - az login --service-principal -u $APP_ID -p $SP_PASSWORD # --tenant $TENANT_ID
     - az aks get-credentials --resource-group $AKS_RESOURCE_GROUP --name $AKS_CLUSTER_NAME --overwrite-existing
     - sed -i 's|image: .*|image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA|' deployment.yaml
     - kubectl apply -f deployment.yaml
