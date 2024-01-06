@@ -21,8 +21,17 @@ spec:
                       - containerPort: 80
                   env:
                       - name: RABBITMQ_URL
-                        value: "amqp://guest:guest@rabbitmq:5672"
+                        valueFrom:
+                            secretKeyRef:
+                                name: rabbitmq-url
+                                key: RABBITMQ_URL
                       - name: SECRET_KEY
-                        value: "a43de72d46a42b9fb4a25c65b9d37db55221a2546d62ee579c73f52c62c4c060"
+                        valueFrom:
+                            secretKeyRef:
+                                name: secret-key
+                                key: SECRET_KEY
                       - name: DB_CONNECTION_STRING
-                        value: "host=lavoro-pgsql.postgres.database.azure.com port=5432 dbname=config user=postgres password=PgSql123"
+                        valueFrom:
+                            secretKeyRef:
+                                name: db-connection-string
+                                key: DB_CONNECTION_STRING
