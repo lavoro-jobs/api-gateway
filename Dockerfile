@@ -2,7 +2,6 @@ FROM python:3.9-alpine AS base
 
 WORKDIR /app
 
-
 FROM base AS development
 
 COPY ./lavoro-api-gateway/requirements.txt /app/requirements.txt
@@ -27,7 +26,7 @@ CMD ["uvicorn", "lavoro_api_gateway.api_gateway:app", "--host", "0.0.0.0", "--po
 
 FROM base AS production
 
-COPY ./requirements.txt /app/requirements.txt
+COPY ./requirements-prod.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./lavoro_api_gateway /app/lavoro_api_gateway
