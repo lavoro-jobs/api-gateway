@@ -6,7 +6,6 @@ import requests
 from lavoro_api_gateway.common import fill_database_model_with_catalog_data, propagate_response
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
 from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, ApplicantProfileForJobPostDTO, ExperienceDTO
-from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO, RecruiterProfileDTO
 from lavoro_library.model.matching_api.db_models import Match
