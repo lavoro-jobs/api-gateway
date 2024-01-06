@@ -18,7 +18,7 @@ build_api_gateway:
         - ls -la
         - echo "Building Docker image..."
         - docker login $ACR_SERVER -u $APP_ID -p $SP_PASSWORD
-        - docker build -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+        - docker build -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA . --target production
         - docker push $IMAGE_NAME:$CI_COMMIT_SHORT_SHA
     only:
         - master
