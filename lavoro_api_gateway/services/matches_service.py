@@ -6,6 +6,7 @@ import requests
 from lavoro_api_gateway.common import fill_database_model_with_catalog_data, propagate_response
 from lavoro_library.model.applicant_api.db_models import ApplicantProfile, Experience
 from lavoro_library.model.applicant_api.dtos import ApplicantProfileDTO, ApplicantProfileForJobPostDTO, ExperienceDTO
+from lavoro_library.model.auth_api.db_models import Account
 from lavoro_library.model.company_api.db_models import JobPost
 from lavoro_library.model.company_api.dtos import CompanyDTO, JobPostDTO, JobPostForApplicantDTO, RecruiterProfileDTO
 from lavoro_library.model.matching_api.db_models import Match
@@ -114,6 +115,12 @@ def get_applications_by_job_post(job_post_id: uuid.UUID):
 
         hydrated_applicant_profile.experiences = hydrated_experiences
         application.applicant = hydrated_applicant_profile
+
+        stream_chat_token_response = requests.get(
+            f"http://auth-api/account/get-stream-chat-token/{application.applicant_account_id}"
+        )
+        stream_chat_token = propagate_response(stream_chat_token_response)["stream_chat_token"]
+        application.applicant_stream_chat_token = stream_chat_token
 
     return applications_dtos
 
