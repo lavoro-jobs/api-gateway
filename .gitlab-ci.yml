@@ -28,7 +28,7 @@ deploy_to_aks:
     - echo "Deploying to AKS..."
     - az login --service-principal -u $APP_ID -p $SP_PASSWORD # --tenant $TENANT_ID
     - az aks get-credentials --resource-group $AKS_RESOURCE_GROUP --name $AKS_CLUSTER_NAME --overwrite-existing
-    - sed -i 's|image: .*|image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA|' deployment.yaml
+    - sed -i 's|image: .*|image: $IMAGE_NAME:$CI_COMMIT_SHORT_SHA|' deployment/deployment.yaml
     - kubectl apply -f deployment/deployment.yaml
     - kubectl apply -f deployment/service.yaml
   only:
