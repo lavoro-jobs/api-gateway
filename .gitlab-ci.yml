@@ -14,6 +14,8 @@ build_api_gateway:
     services:
         - docker:19.03.12-dind
     script:
+        - echo "Files in current directory:"
+        - ls -la
         - echo "Building Docker image..."
         - docker login $ACR_SERVER -u $APP_ID -p $SP_PASSWORD
         - docker build -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
