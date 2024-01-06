@@ -10,9 +10,9 @@ variables:
 
 build_api_gateway:
     stage: build
-    image: docker:19.03.12
+    image: docker:24.0.7
     services:
-        - docker:19.03.12-dind
+        - docker:24.0.7-dind
     before_script:
         - echo "Building Docker image..."
         - docker login $ACR_SERVER -u $APP_ID -p $SP_PASSWORD
