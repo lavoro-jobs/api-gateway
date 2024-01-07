@@ -119,7 +119,10 @@ def join_company(invite_token: str, payload: JoinCompanyDTO):
     propagate_response(register_response)
     user = common.get_account(invitation.email)
     create_recruiter_profile_request = CreateRecruiterProfileDTO(
-        company_id=invitation.company_id, first_name=payload.first_name, last_name=payload.last_name
+        company_id=invitation.company_id,
+        first_name=payload.first_name,
+        last_name=payload.last_name,
+        profile_picture=payload.profile_picture,
     )
     create_recruiter_profile_response = requests.post(
         f"http://company-api/recruiter/create-recruiter-profile/{user.id}/{RecruiterRole.employee}",
